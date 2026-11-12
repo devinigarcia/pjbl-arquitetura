@@ -7,7 +7,10 @@ Duração alvo: **10 a 12 minutos**. O enunciado pede duas coisas que não podem
 
 Integrantes:
 
-{{ALUNOS}}
+- Arthur Ambrozewicz Cidral
+- Erick Marlon Barbieri da Silva
+- Luan Alberti Estevinho
+- Vinícius de Oliveira Garcia
 
 ## Antes de gravar (checklist)
 
@@ -34,40 +37,39 @@ Integrantes:
 
 ## Divisão
 
-O roteiro tem **quatro blocos** com tempo parecido. Com quatro pessoas, um bloco para cada. Com três, a mesma pessoa faz
-os blocos 1 e 4 (abertura e fechamento). Com cinco, o bloco 3 se divide em "evento de criação" e "cancelamento + agregação".
-Com duas, uma pessoa faz 1 e 3 e a outra 2 e 4.
+O roteiro tem **quatro blocos** com tempo parecido, um para cada integrante. A divisão abaixo é uma sugestão:
+se preferirem trocar quem apresenta o quê, é só trocar os nomes — o importante é cada um dizer o próprio nome ao começar.
 
 | Bloco | Quem | Tema | Tempo |
 |---|---|---|---|
-| 1 | Aluno 1 | Arquitetura e o caminho de uma requisição | ~2min30 |
-| 2 | Aluno 2 | CRUD de produtos (MongoDB) e de pedidos (Azure SQL) com as regras de negócio | ~3min |
-| 3 | Aluno 3 | Eventos: outbox → fila → Function → estoque; `/aggregated-data` | ~3min |
-| 4 | Aluno 4 | Swagger, gateway, Docker Hub, GitHub Actions e testes de arquitetura | ~3min |
+| 1 | Vinícius | Arquitetura e o caminho de uma requisição | ~2min30 |
+| 2 | Arthur | CRUD de produtos (MongoDB) e de pedidos (Azure SQL) com as regras de negócio | ~3min |
+| 3 | Erick | Eventos: outbox → fila → Function → estoque; `/aggregated-data` | ~3min |
+| 4 | Luan | Swagger, gateway, Docker Hub, GitHub Actions e testes de arquitetura | ~3min |
 
 ---
 
-## Bloco 1 — Arquitetura e caminho da requisição (Aluno 1)
+## Bloco 1 — Arquitetura e caminho da requisição (Vinícius)
 
-**Fala de abertura:** "Olá, eu sou **[nome]**, e este é o Conecta Store, o projeto PJBL do nosso grupo. Comigo estão
-**[nome 2]**, **[nome 3]** e **[nome 4]**, que vão se apresentar ao longo do vídeo. Eu vou mostrar a arquitetura e como
+**Fala de abertura:** "Olá, eu sou **Vinícius**, e este é o Conecta Store, o projeto PJBL do nosso grupo. Comigo estão
+**Arthur**, **Erick** e **Luan**, que vão se apresentar ao longo do vídeo. Eu vou mostrar a arquitetura e como
 uma chamada atravessa o sistema."
 
 | Tela | O que mostrar | O que dizer |
 |---|---|---|
 | PDF — C4 Containers | Passar o mouse pelo caminho Microfrontend → Gateway → BFF → serviços | "O front só conhece o API Gateway. O gateway repassa para o BFF, e o BFF fala com os dois microserviços e com a Azure Function. O ms-produtos usa MongoDB Atlas e o ms-pedidos usa Azure SQL." |
-| PDF — C4 Containers | Apontar as linhas tracejadas | "As linhas tracejadas são a parte orientada a eventos: o ms-pedidos publica numa fila, a Function consome e atualiza o estoque. O [nome 3] vai mostrar isso funcionando." |
+| PDF — C4 Containers | Apontar as linhas tracejadas | "As linhas tracejadas são a parte orientada a eventos: o ms-pedidos publica numa fila, a Function consome e atualiza o estoque. O Erick vai mostrar isso funcionando." |
 | Frontend — barra de endereço | Mostrar a URL pública | "Tudo o que vamos mostrar está na nuvem. Este é o front, um microfrontend em React: o shell carrega em tempo de execução dois módulos remotos, Produtos e Pedidos." |
 | Frontend — painel | Mostrar os cartões e o bloco "Fontes de dados" | "Esta tela faz **uma única chamada**, o `GET /aggregated-data`. Aqui embaixo aparece de onde veio cada parte: ms-produtos, ms-pedidos e Azure Function, com o tempo de cada um." |
 | DevTools → Network | Clicar na requisição `aggregated-data` → *Headers* | "A chamada vai para o domínio do API Management, não para o BFF. Na resposta vêm o `x-gateway`, que o gateway coloca, o `x-served-by: pjbl-bff` e o `x-correlation-id`, que acompanha a requisição por todos os serviços." |
 | DevTools → Network → *Timing* | Mostrar o *Server Timing* | "E o BFF devolve o tempo gasto em cada serviço no cabeçalho `Server-Timing`." |
 | Frontend — painel "Chamadas ao BFF" | Abrir o painel | "O próprio front mostra essas informações para cada chamada." |
 
-**Passagem:** "Agora o **[nome 2]** mostra o CRUD e as regras de negócio."
+**Passagem:** "Agora o **Arthur** mostra o CRUD e as regras de negócio."
 
-## Bloco 2 — CRUD e regras de negócio (Aluno 2)
+## Bloco 2 — CRUD e regras de negócio (Arthur)
 
-**Fala de abertura:** "Eu sou **[nome 2]** e vou mostrar o CRUD de produtos, que fica no MongoDB, e o de pedidos, que fica no Azure SQL."
+**Fala de abertura:** "Eu sou **Arthur** e vou mostrar o CRUD de produtos, que fica no MongoDB, e o de pedidos, que fica no Azure SQL."
 
 | Tela | O que fazer | O que dizer |
 |---|---|---|
@@ -81,11 +83,11 @@ uma chamada atravessa o sistema."
 | Front → Pedidos | Tentar excluir um pedido que não está cancelado (ou mostrar o botão indisponível) / editar um pedido PAGO | "Só dá para editar pedido pendente e só dá para excluir pedido cancelado." |
 | Portal Azure → Query editor | `SELECT TOP 5 Id, CustomerName, Status, Total FROM dbo.Orders ORDER BY CreatedAt DESC;` | "E aqui está o pedido no Azure SQL." |
 
-**Passagem:** "O **[nome 3]** vai mostrar o que aconteceu com o estoque depois desse pedido."
+**Passagem:** "O **Erick** vai mostrar o que aconteceu com o estoque depois desse pedido."
 
-## Bloco 3 — Eventos e agregação (Aluno 3)
+## Bloco 3 — Eventos e agregação (Erick)
 
-**Fala de abertura:** "Eu sou **[nome 3]**. Quando o pedido foi criado, ninguém chamou o ms-produtos para baixar o estoque. Isso é feito por evento."
+**Fala de abertura:** "Eu sou **Erick**. Quando o pedido foi criado, ninguém chamou o ms-produtos para baixar o estoque. Isso é feito por evento."
 
 | Tela | O que fazer | O que dizer |
 |---|---|---|
@@ -99,11 +101,11 @@ uma chamada atravessa o sistema."
 | Front → Painel | Mostrar os indicadores atualizados e os eventos recentes | "No painel, os indicadores — faturamento, ticket médio, produtos com estoque baixo, alertas — são calculados pela Azure Function, no HTTP Trigger. O BFF manda os produtos e os pedidos e ela devolve os números." |
 | Swagger do BFF | Executar `GET /aggregated-data` (servidor "Pelo API Gateway", autorizado) e mostrar o JSON | "Este é o JSON único que o enunciado pede: produtos, pedidos, eventos, indicadores e a situação de cada fonte." |
 
-**Passagem:** "Para fechar, o **[nome 4]** mostra a documentação, o gateway e os testes."
+**Passagem:** "Para fechar, o **Luan** mostra a documentação, o gateway e os testes."
 
-## Bloco 4 — Swagger, gateway, Docker, CI e testes (Aluno 4)
+## Bloco 4 — Swagger, gateway, Docker, CI e testes (Luan)
 
-**Fala de abertura:** "Eu sou **[nome 4]** e vou mostrar a documentação das APIs, o API Gateway e como garantimos a arquitetura no código."
+**Fala de abertura:** "Eu sou **Luan** e vou mostrar a documentação das APIs, o API Gateway e como garantimos a arquitetura no código."
 
 | Tela | O que fazer | O que dizer |
 |---|---|---|

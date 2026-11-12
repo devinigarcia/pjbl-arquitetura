@@ -189,4 +189,7 @@ dentro da franquia mensal com o uso de um projeto de disciplina.
 
 ## Alunos
 
-{{ALUNOS}}
+- Arthur Ambrozewicz Cidral
+- Erick Marlon Barbieri da Silva
+- Luan Alberti Estevinho
+- Vinícius de Oliveira Garcia
