@@ -1,11 +1,11 @@
 {
   "GITHUB_USER": "devinigarcia",
-  "DOCKERHUB_USER": "",
+  "DOCKERHUB_USER": "vinigarciaa",
   "URL_FRONTEND": "https://devinigarcia.github.io/pjbl-microfrontend",
-  "URL_GATEWAY": "",
-  "URL_BFF": "",
-  "URL_MS_PRODUTOS": "",
-  "URL_MS_PEDIDOS": "",
-  "URL_FUNCTION": "",
+  "URL_GATEWAY": "https://apim-pjbl-0a42b2.azure-api.net/conecta",
+  "URL_BFF": "https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io",
+  "URL_MS_PRODUTOS": "https://ms-produtos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io",
+  "URL_MS_PEDIDOS": "https://ms-pedidos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io",
+  "URL_FUNCTION": "https://func-pjbl-0a42b2.azurewebsites.net",
   "URL_VIDEO": ""
 }

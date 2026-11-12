@@ -123,8 +123,9 @@ try {
     $policyXml = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'policy.xml'))
     $policyFile = Join-Path $workDir 'policy.json'
     Write-JsonFile $policyFile @{ properties = @{ format = 'rawxml'; value = $policyXml } }
+    # --output-file: a resposta desta chamada vem com BOM e o az no Windows falha ao tentar mostrá-la na tela
     Invoke-Az rest --method put --uri "$management/apis/$ApiId/policies/policy?api-version=$apiVersion" `
-        --body "@$policyFile" --output none
+        --body "@$policyFile" --output-file (Join-Path $workDir 'policy-resposta.txt')
 
     # ---------- 5. subscription do front ----------
     Write-Host '[5/5] Subscription "microfrontend"...' -ForegroundColor Cyan

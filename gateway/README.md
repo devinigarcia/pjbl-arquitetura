@@ -36,7 +36,7 @@ O `infra/deploy-azure.ps1` já chama o `configurar-apim.ps1`. Para rodar só o g
 
 ```powershell
 ./azure-apim/configurar-apim.ps1 -ResourceGroup rg-pjbl -ApimName apim-pjbl-xxxxxx -Location brazilsouth `
-    -BffUrl {{URL_BFF}} -PublisherEmail seu-email@exemplo.com
+    -BffUrl https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io -PublisherEmail seu-email@exemplo.com
 ```
 
 O segredo do gateway é pedido de forma oculta e fica guardado como *Named Value* secreto do APIM — ele não aparece
@@ -46,13 +46,13 @@ no `policy.xml` (o `{{bff-gateway-secret}}` que está lá é a sintaxe do própr
 
 ```bash
 # sem chave: o gateway barra com 401
-curl -i {{URL_GATEWAY}}/aggregated-data
+curl -i https://apim-pjbl-0a42b2.azure-api.net/conecta/aggregated-data
 
 # com chave: 200, e a resposta vem com x-gateway: azure-api-management e x-served-by: pjbl-bff
-curl -i -H "Ocp-Apim-Subscription-Key: <chave>" {{URL_GATEWAY}}/aggregated-data
+curl -i -H "Ocp-Apim-Subscription-Key: <chave>" https://apim-pjbl-0a42b2.azure-api.net/conecta/aggregated-data
 
 # direto no BFF, pulando o gateway: 401 UNAUTHORIZED
-curl -i {{URL_BFF}}/aggregated-data
+curl -i https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/aggregated-data
 ```
 
 Observações da camada Consumption: a policy `rate-limit` (por subscription) está disponível, mas a `rate-limit-by-key`

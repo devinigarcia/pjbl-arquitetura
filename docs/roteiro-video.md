@@ -20,16 +20,16 @@ Integrantes:
 - [ ] Deixar abertas, em abas, nesta ordem:
   1. PDF da entrega na página do C4 nível 2 (Containers)
   2. Frontend — https://devinigarcia.github.io/pjbl-microfrontend
-  3. Swagger do BFF — {{URL_BFF}}/docs
-  4. Swagger do ms-produtos — {{URL_MS_PRODUTOS}}/docs
-  5. Swagger do ms-pedidos — {{URL_MS_PEDIDOS}}/docs
-  6. Eventos (AsyncAPI) — {{URL_MS_PEDIDOS}}/events/docs
-  7. Swagger da Function — {{URL_FUNCTION}}/api/docs
+  3. Swagger do BFF — https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs
+  4. Swagger do ms-produtos — https://ms-produtos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs
+  5. Swagger do ms-pedidos — https://ms-pedidos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs
+  6. Eventos (AsyncAPI) — https://ms-pedidos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/events/docs
+  7. Swagger da Function — https://func-pjbl-0a42b2.azurewebsites.net/api/docs
   8. MongoDB Atlas → *Browse Collections* → banco `pjbl_produtos`
   9. Portal Azure → banco `pjbl-pedidos` → *Query editor*
   10. Portal Azure → Function App → `processOrderEvent` → *Invocations* (ou *Log stream*)
   11. Portal Azure → API Management → API "Conecta Store BFF" → *Design* (policy)
-  12. Docker Hub — https://hub.docker.com/u/{{DOCKERHUB_USER}}
+  12. Docker Hub — https://hub.docker.com/u/vinigarciaa
   13. GitHub — https://github.com/devinigarcia/pjbl-bff/actions
 - [ ] No navegador do front, abrir o DevTools (F12) na aba **Network**, com o filtro *Fetch/XHR*.
 - [ ] Um terminal aberto na pasta `pjbl-bff` (para o bloco dos testes).
@@ -111,8 +111,8 @@ uma chamada atravessa o sistema."
 |---|---|---|
 | Swagger ms-produtos, ms-pedidos, Function | Passar rápido pelas três abas | "Cada serviço tem o seu Swagger publicado: ms-produtos, ms-pedidos e a Function." |
 | Portal Azure → API Management → policy | Mostrar a policy | "O gateway é o Azure API Management. A policy exige a chave de assinatura, limita a 120 chamadas por minuto, trata o CORS e injeta um segredo que só o gateway conhece." |
-| Terminal ou nova aba | Abrir `{{URL_GATEWAY}}/aggregated-data` sem chave → 401 | "Sem a chave, o gateway barra." |
-| Nova aba | Abrir `{{URL_BFF}}/aggregated-data` direto → 401 | "E quem tenta pular o gateway e chamar o BFF direto também recebe 401, porque falta o segredo." |
+| Terminal ou nova aba | Abrir `https://apim-pjbl-0a42b2.azure-api.net/conecta/aggregated-data` sem chave → 401 | "Sem a chave, o gateway barra." |
+| Nova aba | Abrir `https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/aggregated-data` direto → 401 | "E quem tenta pular o gateway e chamar o BFF direto também recebe 401, porque falta o segredo." |
 | Docker Hub | Mostrar as três imagens com a tag `v1` | "As imagens do BFF e dos dois microserviços estão no Docker Hub…" |
 | GitHub → Actions | Abrir uma execução verde, mostrar os jobs de teste e de imagem | "…e são publicadas pelo GitHub Actions, depois que os testes passam." |
 | GitHub → `pjbl-ms-pedidos/src` | Abrir as pastas `domain`, `application/features`, `infrastructure`, `api` | "Todos os serviços têm as quatro camadas da Clean Architecture, e dentro de `features` uma pasta por caso de uso — `CreateOrder`, `GetOrder` — que é o Vertical Slice." |

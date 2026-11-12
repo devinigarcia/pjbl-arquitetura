@@ -9,17 +9,17 @@ o script que sobe a nuvem, o `docker-compose` para rodar tudo local e os scripts
 | Repositório | O que é | Na nuvem |
 |---|---|---|
 | [pjbl-microfrontend](https://github.com/devinigarcia/pjbl-microfrontend) | Interface em React com Module Federation (shell + remotes de Produtos e Pedidos) | https://devinigarcia.github.io/pjbl-microfrontend |
-| [pjbl-bff](https://github.com/devinigarcia/pjbl-bff) | Backend for Frontend (Node + Express): agregação, orquestração e proxy | {{URL_BFF}}/docs |
-| [pjbl-ms-produtos](https://github.com/devinigarcia/pjbl-ms-produtos) | Microserviço de produtos e estoque — MongoDB Atlas | {{URL_MS_PRODUTOS}}/docs |
-| [pjbl-ms-pedidos](https://github.com/devinigarcia/pjbl-ms-pedidos) | Microserviço de pedidos — Azure SQL, outbox e eventos | {{URL_MS_PEDIDOS}}/docs · [eventos]({{URL_MS_PEDIDOS}}/events/docs) |
-| [pjbl-function](https://github.com/devinigarcia/pjbl-function) | Azure Function: HTTP Trigger (indicadores) e Queue Trigger (estoque) | {{URL_FUNCTION}}/api/docs |
+| [pjbl-bff](https://github.com/devinigarcia/pjbl-bff) | Backend for Frontend (Node + Express): agregação, orquestração e proxy | https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs |
+| [pjbl-ms-produtos](https://github.com/devinigarcia/pjbl-ms-produtos) | Microserviço de produtos e estoque — MongoDB Atlas | https://ms-produtos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs |
+| [pjbl-ms-pedidos](https://github.com/devinigarcia/pjbl-ms-pedidos) | Microserviço de pedidos — Azure SQL, outbox e eventos | https://ms-pedidos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs · [eventos](https://ms-pedidos.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/events/docs) |
+| [pjbl-function](https://github.com/devinigarcia/pjbl-function) | Azure Function: HTTP Trigger (indicadores) e Queue Trigger (estoque) | https://func-pjbl-0a42b2.azurewebsites.net/api/docs |
 | **pjbl-arquitetura** (este) | Documentação, gateway, infraestrutura e scripts | — |
 
-Entrada oficial da aplicação (API Gateway): {{URL_GATEWAY}}
+Entrada oficial da aplicação (API Gateway): https://apim-pjbl-0a42b2.azure-api.net/conecta
 Vídeo da apresentação: {{URL_VIDEO}}
-Imagens no Docker Hub: [pjbl-bff](https://hub.docker.com/r/{{DOCKERHUB_USER}}/pjbl-bff) ·
-[pjbl-ms-produtos](https://hub.docker.com/r/{{DOCKERHUB_USER}}/pjbl-ms-produtos) ·
-[pjbl-ms-pedidos](https://hub.docker.com/r/{{DOCKERHUB_USER}}/pjbl-ms-pedidos)
+Imagens no Docker Hub: [pjbl-bff](https://hub.docker.com/r/vinigarciaa/pjbl-bff) ·
+[pjbl-ms-produtos](https://hub.docker.com/r/vinigarciaa/pjbl-ms-produtos) ·
+[pjbl-ms-pedidos](https://hub.docker.com/r/vinigarciaa/pjbl-ms-pedidos)
 
 ## Arquitetura em uma imagem
 
@@ -143,7 +143,7 @@ Pré-requisitos: conta Azure (usamos Azure for Students), cluster gratuito no Mo
 
 ```powershell
 cd pjbl-arquitetura
-./infra/deploy-azure.ps1 -DockerHubUser {{DOCKERHUB_USER}} -PublisherEmail seu-email@exemplo.com
+./infra/deploy-azure.ps1 -DockerHubUser vinigarciaa -PublisherEmail seu-email@exemplo.com
 ```
 
 O script pede a connection string do Atlas de forma oculta, cria os recursos (resource group, fila, Azure SQL gratuito,
@@ -155,12 +155,14 @@ Pode ser executado de novo sem duplicar nada. Parâmetros úteis:
 | `-Location` | Região (padrão `brazilsouth`). Assinaturas de estudante às vezes só liberam algumas regiões. |
 | `-MinReplicas 1` | Mantém os containers ligados (sem espera na primeira chamada). Bom para o dia da apresentação. |
 | `-SkipGateway` / `-SkipFunctionCode` | Pula uma etapa. |
+| `-OnlyBase` | Cria só a base (resource group, fila, Azure SQL e ambiente de containers), sem depender das imagens nem do Atlas. |
+| `-MongoHost` e `-MongoUser` | Informa o endereço do cluster e o usuário do banco; o script pede só a senha. Com `-MongoPasswordFromClipboard`, ele lê a senha copiada no site do Atlas. |
 
 Depois do deploy:
 
 ```powershell
 # dados de demonstração, passando pelo gateway
-$env:API_URL = "{{URL_GATEWAY}}"
+$env:API_URL = "https://apim-pjbl-0a42b2.azure-api.net/conecta"
 $env:API_KEY = "<subscription key do gateway>"
 node scripts/seed.mjs
 
