@@ -8,11 +8,11 @@ o script que sobe a nuvem, o `docker-compose` para rodar tudo local e os scripts
 
 | Repositório | O que é | Na nuvem |
 |---|---|---|
-| [pjbl-microfrontend](https://github.com/{{GITHUB_USER}}/pjbl-microfrontend) | Interface em React com Module Federation (shell + remotes de Produtos e Pedidos) | {{URL_FRONTEND}} |
-| [pjbl-bff](https://github.com/{{GITHUB_USER}}/pjbl-bff) | Backend for Frontend (Node + Express): agregação, orquestração e proxy | {{URL_BFF}}/docs |
-| [pjbl-ms-produtos](https://github.com/{{GITHUB_USER}}/pjbl-ms-produtos) | Microserviço de produtos e estoque — MongoDB Atlas | {{URL_MS_PRODUTOS}}/docs |
-| [pjbl-ms-pedidos](https://github.com/{{GITHUB_USER}}/pjbl-ms-pedidos) | Microserviço de pedidos — Azure SQL, outbox e eventos | {{URL_MS_PEDIDOS}}/docs · [eventos]({{URL_MS_PEDIDOS}}/events/docs) |
-| [pjbl-function](https://github.com/{{GITHUB_USER}}/pjbl-function) | Azure Function: HTTP Trigger (indicadores) e Queue Trigger (estoque) | {{URL_FUNCTION}}/api/docs |
+| [pjbl-microfrontend](https://github.com/devinigarcia/pjbl-microfrontend) | Interface em React com Module Federation (shell + remotes de Produtos e Pedidos) | https://devinigarcia.github.io/pjbl-microfrontend |
+| [pjbl-bff](https://github.com/devinigarcia/pjbl-bff) | Backend for Frontend (Node + Express): agregação, orquestração e proxy | {{URL_BFF}}/docs |
+| [pjbl-ms-produtos](https://github.com/devinigarcia/pjbl-ms-produtos) | Microserviço de produtos e estoque — MongoDB Atlas | {{URL_MS_PRODUTOS}}/docs |
+| [pjbl-ms-pedidos](https://github.com/devinigarcia/pjbl-ms-pedidos) | Microserviço de pedidos — Azure SQL, outbox e eventos | {{URL_MS_PEDIDOS}}/docs · [eventos]({{URL_MS_PEDIDOS}}/events/docs) |
+| [pjbl-function](https://github.com/devinigarcia/pjbl-function) | Azure Function: HTTP Trigger (indicadores) e Queue Trigger (estoque) | {{URL_FUNCTION}}/api/docs |
 | **pjbl-arquitetura** (este) | Documentação, gateway, infraestrutura e scripts | — |
 
 Entrada oficial da aplicação (API Gateway): {{URL_GATEWAY}}

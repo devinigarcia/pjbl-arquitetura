@@ -16,7 +16,7 @@ Integrantes:
 - [ ] Rodar `node scripts/seed.mjs` para ter produtos e pedidos.
 - [ ] Deixar abertas, em abas, nesta ordem:
   1. PDF da entrega na página do C4 nível 2 (Containers)
-  2. Frontend — {{URL_FRONTEND}}
+  2. Frontend — https://devinigarcia.github.io/pjbl-microfrontend
   3. Swagger do BFF — {{URL_BFF}}/docs
   4. Swagger do ms-produtos — {{URL_MS_PRODUTOS}}/docs
   5. Swagger do ms-pedidos — {{URL_MS_PEDIDOS}}/docs
@@ -27,7 +27,7 @@ Integrantes:
   10. Portal Azure → Function App → `processOrderEvent` → *Invocations* (ou *Log stream*)
   11. Portal Azure → API Management → API "Conecta Store BFF" → *Design* (policy)
   12. Docker Hub — https://hub.docker.com/u/{{DOCKERHUB_USER}}
-  13. GitHub — https://github.com/{{GITHUB_USER}}/pjbl-bff/actions
+  13. GitHub — https://github.com/devinigarcia/pjbl-bff/actions
 - [ ] No navegador do front, abrir o DevTools (F12) na aba **Network**, com o filtro *Fetch/XHR*.
 - [ ] Um terminal aberto na pasta `pjbl-bff` (para o bloco dos testes).
 - [ ] Esconder a subscription key e qualquer segredo antes de compartilhar a tela (no DevTools ela aparece no cabeçalho `Ocp-Apim-Subscription-Key`: não dê zoom nela).
