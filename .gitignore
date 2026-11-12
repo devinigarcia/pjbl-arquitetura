@@ -1,0 +1,15 @@
+# valores reais ficam fora do Git (só os .example são versionados)
+.env
+links.aplicados.json
+*.local.yaml
+*.local.json
+
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# arquivos intermediários da geração do PDF
+docs/entrega/.tmp/
