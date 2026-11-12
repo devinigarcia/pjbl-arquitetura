@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Sobe toda a parte Azure do Conecta Store. Pode rodar quantas vezes quiser (idempotente).
 
@@ -21,15 +21,17 @@
   Pré-requisitos: Azure CLI logado (az login), imagens já publicadas no Docker Hub, Node 22+.
 
 .EXAMPLE
-  ./deploy-azure.ps1 -DockerHubUser meuusuario -PublisherEmail eu@exemplo.com
+  ./deploy-azure.ps1 -DockerHubUser meuusuario
 
 .EXAMPLE
   ./deploy-azure.ps1 -DockerHubUser meuusuario -PublisherEmail eu@exemplo.com -Location eastus2 -MinReplicas 1
 #>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)] [string] $DockerHubUser,
-    [Parameter(Mandatory)] [string] $PublisherEmail,
+    # Usuário do Docker Hub onde estão as imagens. Só é dispensável com -OnlyBase.
+    [string] $DockerHubUser,
+    # E-mail de contato do API Management. Se nao for informado, usa o e-mail da conta logada na Azure.
+    [string] $PublisherEmail,
     [string] $Location = 'brazilsouth',
     # Algumas assinaturas de estudante só liberam certas regiões; estes dois permitem variar só um serviço.
     [string] $FunctionLocation,
@@ -40,12 +42,22 @@ param(
     [string] $Suffix,
     # 0 = os containers "dormem" sem uso (mais barato). Use 1 no dia da apresentação para não ter espera.
     [ValidateRange(0, 1)] [int] $MinReplicas = 0,
-    [string] $FunctionProjectPath = (Join-Path $PSScriptRoot '..\..\pjbl-function'),
+    # Pasta do projeto da Function (padrão: a pasta pjbl-function ao lado deste repositório)
+    [string] $FunctionProjectPath,
+    # Cria só a base que não depende das imagens nem do MongoDB (resource group, fila, Azure SQL e
+    # ambiente do Container Apps) e para. Rodar de novo sem o switch continua de onde parou.
+    [switch] $OnlyBase,
     [switch] $SkipFunctionCode,
     [switch] $SkipGateway
 )
 
 $ErrorActionPreference = 'Stop'
+# Azure CLI recém-instalado pode ainda não estar no PATH deste terminal
+$azDir = 'C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin'
+if (-not (Get-Command az -ErrorAction SilentlyContinue) -and (Test-Path $azDir)) { $env:Path = "$azDir;$env:Path" }
+if (-not $OnlyBase -and -not $DockerHubUser) { throw 'Informe -DockerHubUser (ou use -OnlyBase para criar só a base).' }
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $FunctionProjectPath) { $FunctionProjectPath = Join-Path $scriptDir '..\..\pjbl-function' }
 if (-not $FunctionLocation) { $FunctionLocation = $Location }
 if (-not $ApimLocation) { $ApimLocation = $Location }
 
@@ -58,7 +70,10 @@ function Invoke-Az {
 
 function Test-AzResource {
     # true se o comando "az ... show" encontrar o recurso
-    & az @args --output none 2>$null
+    # No PowerShell 5.1, redirecionar o stderr de um programa externo com ErrorActionPreference = Stop
+    # vira exceção. Aqui o "não encontrado" é uma resposta esperada, então baixamos para Continue.
+    $ErrorActionPreference = 'Continue'
+    & az @args --output none 2>&1 | Out-Null
     return ($LASTEXITCODE -eq 0)
 }
 
@@ -154,6 +169,7 @@ if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
 $account = Invoke-Az account show --output json | ConvertFrom-Json
 Write-Host "   assinatura: $($account.name)"
 $subscriptionId = $account.id
+if (-not $PublisherEmail) { $PublisherEmail = $account.user.name }
 if (-not $Suffix) { $Suffix = ($subscriptionId -replace '-', '').Substring(0, 6).ToLower() }
 
 $names = @{
@@ -174,6 +190,7 @@ foreach ($provider in 'Microsoft.App', 'Microsoft.OperationalInsights', 'Microso
 Invoke-Az extension add --name containerapp --upgrade --only-show-errors --output none
 
 $mongoUri = $env:MONGODB_URI
+if ($OnlyBase) { $mongoUri = 'mongodb://nao-usado-no-modo-base' }
 if (-not $mongoUri) {
     $mongoUri = ConvertTo-PlainText (Read-Host -AsSecureString 'Connection string do MongoDB Atlas (mongodb+srv://...) - a digitação fica oculta')
 }
@@ -218,7 +235,8 @@ try {
         # --use-free-limit é o que torna o banco gratuito; AutoPause garante que nunca vira cobrança
         Invoke-Az sql db create --name $names.sqlDatabase --server $names.sqlServer --resource-group $ResourceGroup `
             --edition GeneralPurpose --family Gen5 --capacity 2 --compute-model Serverless `
-            --use-free-limit true --free-limit-exhaustion-behavior AutoPause --output none
+            --use-free-limit true --free-limit-exhaustion-behavior AutoPause `
+            --backup-storage-redundancy Local --yes --output none
     }
     $sqlConnection = "Server=tcp:$($names.sqlServer).database.windows.net,1433;Database=$($names.sqlDatabase);" +
     "User ID=$sqlAdmin;Password=$sqlPassword;Encrypt=true;TrustServerCertificate=false;Connection Timeout=60"
@@ -235,6 +253,14 @@ try {
         produtos = "https://ms-produtos.$domain"
         pedidos  = "https://ms-pedidos.$domain"
         bff      = "https://bff.$domain"
+    }
+
+    if ($OnlyBase) {
+        Step 'Base pronta'
+        Write-Host '   resource group, fila, Azure SQL e ambiente do Container Apps criados.'
+        Write-Host "   dominio dos apps: $domain"
+        Write-Host '   Rode de novo sem -OnlyBase (e com -DockerHubUser) para criar os serviços.'
+        return
     }
 
     # -------------------------------------------------------------- 5. microserviços
@@ -304,14 +330,14 @@ try {
     if (-not $SkipGateway) {
         Step "8/8 API Gateway $($names.apim)"
         $secureSecret = ConvertTo-SecureString $gatewaySecret -AsPlainText -Force
-        $gateway = & (Join-Path $PSScriptRoot '..\gateway\azure-apim\configurar-apim.ps1') `
+        $gateway = & (Join-Path $scriptDir '..\gateway\azure-apim\configurar-apim.ps1') `
             -ResourceGroup $ResourceGroup -ApimName $names.apim -Location $ApimLocation -BffUrl $urls.bff `
             -PublisherEmail $PublisherEmail -GatewaySecret $secureSecret
         $urls.gateway = ($gateway | Select-Object -Last 1).ApiUrl
     }
 
     # -------------------------------------------------------------- links.json (sem segredos)
-    $linksPath = Join-Path $PSScriptRoot '..\links.json'
+    $linksPath = Join-Path $scriptDir '..\links.json'
     $links = [ordered]@{}
     if (Test-Path $linksPath) {
         (Get-Content -Raw $linksPath | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $links[$_.Name] = $_.Value }

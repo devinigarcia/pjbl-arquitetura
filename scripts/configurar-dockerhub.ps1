@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Grava os secrets do Docker Hub nos três repositórios que publicam imagem e dispara o CI de novo.
 

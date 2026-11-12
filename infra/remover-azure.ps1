@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Apaga TUDO o que o deploy-azure.ps1 criou (o resource group inteiro). Não tem volta.
 

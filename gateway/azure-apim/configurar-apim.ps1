@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Cria (ou atualiza) o API Gateway do projeto no Azure API Management - camada Consumption.
 
@@ -32,12 +32,23 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $apiVersion = '2022-08-01'
+# Azure CLI recém-instalado pode ainda não estar no PATH deste terminal
+$azDir = 'C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin'
+if (-not (Get-Command az -ErrorAction SilentlyContinue) -and (Test-Path $azDir)) { $env:Path = "$azDir;$env:Path" }
 
 function Invoke-Az {
     # Roda o az e para o script se der erro (o PowerShell não faz isso sozinho com programas externos).
     $output = & az @args
     if ($LASTEXITCODE -ne 0) { throw "Falhou: az $($args -join ' ')" }
     return $output
+}
+
+function Test-Az {
+    # true se o comando do az terminar com sucesso; o erro (ex.: recurso não existe) é esperado e fica em silêncio.
+    # No PowerShell 5.1, redirecionar o stderr com ErrorActionPreference = Stop vira exceção, por isso o Continue.
+    $ErrorActionPreference = 'Continue'
+    & az @args --output none 2>&1 | Out-Null
+    return ($LASTEXITCODE -eq 0)
 }
 
 function ConvertTo-PlainText([securestring] $secure) {
@@ -66,8 +77,7 @@ New-Item -ItemType Directory -Path $workDir | Out-Null
 try {
     # ---------- 1. instância ----------
     Write-Host "[1/5] API Management '$ApimName' (Consumption)..." -ForegroundColor Cyan
-    & az apim show --name $ApimName --resource-group $ResourceGroup --output none 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    if (-not (Test-Az apim show --name $ApimName --resource-group $ResourceGroup)) {
         Write-Host '      criando - costuma levar de 2 a 5 minutos...'
         Invoke-Az apim create --name $ApimName --resource-group $ResourceGroup --location $Location `
             --publisher-email $PublisherEmail --publisher-name $PublisherName --sku-name Consumption --output none
@@ -84,8 +94,7 @@ try {
         --body "@$namedValueFile" --output none
     # o named value é criado de forma assíncrona; espera ficar disponível antes de usar na policy
     foreach ($attempt in 1..20) {
-        & az rest --method get --uri "$management/namedValues/bff-gateway-secret?api-version=$apiVersion" --output none 2>$null
-        if ($LASTEXITCODE -eq 0) { break }
+        if (Test-Az rest --method get --uri "$management/namedValues/bff-gateway-secret?api-version=$apiVersion") { break }
         Start-Sleep -Seconds 3
     }
 
