@@ -21,20 +21,35 @@ $repos = 'pjbl-bff', 'pjbl-ms-produtos', 'pjbl-ms-pedidos'
 
 $user = (Read-Host 'Usuario do Docker Hub').Trim()
 if (-not $user) { throw 'Informe o usuario do Docker Hub.' }
-$secure = Read-Host -AsSecureString 'Access Token do Docker Hub (cole e tecle Enter - nao aparece na tela)'
-$pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
-try { $token = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer).Trim() }
-finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
-if (-not $token) { throw 'O token veio vazio.' }
 
+Write-Host ''
+Write-Host 'Agora o TOKEN. Nao e o nome que voce deu a ele (ex.: "pjbl"):' -ForegroundColor Yellow
+Write-Host 'e o codigo longo que comeca com dckr_pat_ e aparece logo depois de clicar em Generate.' -ForegroundColor Yellow
+$token = $null
+while (-not $token) {
+    $secure = Read-Host -AsSecureString 'Cole o token (dckr_pat_...) e tecle Enter - nao aparece na tela'
+    $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+    try { $candidate = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer).Trim() }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
+
+    if ($candidate.Length -lt 20 -or -not $candidate.StartsWith('dckr_pat_')) {
+        Write-Host "  Isso nao parece um token (vieram $($candidate.Length) caracteres). O token comeca com dckr_pat_ . Tente de novo." -ForegroundColor Red
+        continue
+    }
+    $token = $candidate
+}
+
+# Confere do mesmo jeito que o "docker login" faz: pedindo um token de acesso ao registro.
 Write-Host 'Conferindo o token no Docker Hub...'
 try {
-    $body = @{ username = $user; password = $token } | ConvertTo-Json
-    Invoke-RestMethod -Method Post -Uri 'https://hub.docker.com/v2/users/login' -ContentType 'application/json' -Body $body | Out-Null
+    $basic = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("${user}:${token}"))
+    $uri = "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$user/pjbl-bff:push,pull"
+    $answer = Invoke-RestMethod -Method Get -Uri $uri -Headers @{ Authorization = "Basic $basic" }
+    if (-not $answer.token) { throw 'resposta sem token' }
     Write-Host '  token valido.' -ForegroundColor Green
 }
 catch {
-    throw "O Docker Hub recusou esse usuario/token. Confira o nome de usuario e gere um token novo com permissao Read & Write. ($($_.Exception.Message))"
+    throw "O Docker Hub recusou esse usuario/token. Confira se o usuario esta certo (e o nome da conta, nao o e-mail) e gere um token novo com permissao Read & Write. ($($_.Exception.Message))"
 }
 
 foreach ($repo in $repos) {

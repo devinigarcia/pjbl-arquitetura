@@ -118,7 +118,9 @@ try {
 
     # ---------- 4. policy ----------
     Write-Host '[4/5] Aplicando a policy (CORS, rate limit, x-gateway-secret)...' -ForegroundColor Cyan
-    $policyXml = Get-Content -Raw -Path (Join-Path $PSScriptRoot 'policy.xml')
+    # ReadAllText em vez de Get-Content: no PowerShell 5.1 o texto do Get-Content vem com propriedades
+    # extras e o ConvertTo-Json entra em laço tentando serializá-las.
+    $policyXml = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'policy.xml'))
     $policyFile = Join-Path $workDir 'policy.json'
     Write-JsonFile $policyFile @{ properties = @{ format = 'rawxml'; value = $policyXml } }
     Invoke-Az rest --method put --uri "$management/apis/$ApiId/policies/policy?api-version=$apiVersion" `

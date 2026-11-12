@@ -47,6 +47,15 @@ param(
     # Cria só a base que não depende das imagens nem do MongoDB (resource group, fila, Azure SQL e
     # ambiente do Container Apps) e para. Rodar de novo sem o switch continua de onde parou.
     [switch] $OnlyBase,
+    # Pede a connection string do MongoDB de novo, mesmo que já exista uma gravada no ms-produtos.
+    [switch] $NewMongoUri,
+    # Jeito mais simples de informar o MongoDB: host do cluster e usuário do banco (não são segredo).
+    # Com os dois, o script pede só a senha e monta a connection string.
+    [string] $MongoHost,
+    [string] $MongoUser,
+    # Em vez de pedir a senha no terminal, espera você copiar a senha no site do Atlas (botão Copy)
+    # e lê da área de transferência. A senha não é mostrada nem gravada em arquivo.
+    [switch] $MongoPasswordFromClipboard,
     [switch] $SkipFunctionCode,
     [switch] $SkipGateway
 )
@@ -95,6 +104,26 @@ function Write-Utf8File([string] $path, [string] $content) {
     [IO.File]::WriteAllText($path, $content, (New-Object Text.UTF8Encoding($false)))
 }
 
+function Test-MongoUri([string] $uri, [bool] $quiet = $false) {
+    # Tenta um "ping" no MongoDB usando o driver que já está instalado no ms-produtos.
+    # A connection string vai por variável de ambiente, nunca pela linha de comando.
+    $produtos = Join-Path $scriptDir '..\..\pjbl-ms-produtos'
+    if (-not (Test-Path (Join-Path $produtos 'node_modules\mongodb'))) { return $true }
+    $env:PJBL_MONGO_TEST = $uri
+    Push-Location $produtos
+    try {
+        $ErrorActionPreference = 'Continue'
+        # setServers: em alguns Windows o Node não consegue fazer a consulta DNS do tipo SRV (mongodb+srv)
+        # pelo DNS da rede local; usar um DNS público só neste teste resolve.
+        & node -e "const d=require('dns');d.setServers(['8.8.8.8','1.1.1.1']);d.promises.setServers(['8.8.8.8','1.1.1.1']);const{MongoClient}=require('mongodb');const c=new MongoClient(process.env.PJBL_MONGO_TEST,{serverSelectionTimeoutMS:20000});c.db('admin').command({ping:1}).then(()=>c.close()).then(()=>process.exit(0)).catch(e=>{console.log('   motivo: '+e.message);process.exit(1)})" 2>&1 | ForEach-Object { if (-not $quiet) { Write-Host "$_" } }
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        Pop-Location
+        Remove-Item Env:PJBL_MONGO_TEST -ErrorAction SilentlyContinue
+    }
+}
+
 function Step([string] $text) { Write-Host ''; Write-Host "== $text" -ForegroundColor Cyan }
 
 function Publish-ContainerApp {
@@ -110,7 +139,9 @@ function Publish-ContainerApp {
         [hashtable] $SecretEnv = @{}   # VARIAVEL -> nome-do-secret
     )
 
-    $envList = @()
+    # CONFIG_VERSION muda a cada execução: força uma revisão nova, para o container reler os secrets
+    # (que são gerados de novo a cada deploy). Sem isso o app continuaria com as chaves antigas.
+    $envList = @(@{ name = 'CONFIG_VERSION'; value = $script:runStamp })
     foreach ($key in ($Env.Keys | Sort-Object)) { $envList += @{ name = $key; value = [string] $Env[$key] } }
     foreach ($key in ($SecretEnv.Keys | Sort-Object)) { $envList += @{ name = $key; secretRef = $SecretEnv[$key] } }
 
@@ -120,7 +151,7 @@ function Publish-ContainerApp {
     $definition = @{
         location   = $Location
         properties = @{
-            managedEnvironmentId = $script:environmentId
+            environmentId        = $script:environmentId
             configuration        = @{
                 activeRevisionsMode = 'Single'
                 ingress             = @{ external = $true; targetPort = $Port; transport = 'auto'; allowInsecure = $false }
@@ -191,10 +222,72 @@ Invoke-Az extension add --name containerapp --upgrade --only-show-errors --outpu
 
 $mongoUri = $env:MONGODB_URI
 if ($OnlyBase) { $mongoUri = 'mongodb://nao-usado-no-modo-base' }
-if (-not $mongoUri) {
-    $mongoUri = ConvertTo-PlainText (Read-Host -AsSecureString 'Connection string do MongoDB Atlas (mongodb+srv://...) - a digitação fica oculta')
+if (-not $mongoUri -and -not $NewMongoUri -and (Test-AzResource containerapp show --name ms-produtos --resource-group $ResourceGroup)) {
+    # Nova execução: reaproveita a connection string que já está guardada como secret do ms-produtos,
+    # para não ter que pedir de novo. (Use -NewMongoUri para informar outra.)
+    $saved = & az containerapp secret show --name ms-produtos --resource-group $ResourceGroup --secret-name mongodb-uri --query value -o tsv
+    if ($LASTEXITCODE -eq 0 -and $saved) {
+        $mongoUri = "$saved".Trim()
+        Write-Host '   reaproveitando a connection string do MongoDB já gravada no ms-produtos'
+    }
 }
-if ($mongoUri -notmatch '^mongodb(\+srv)?://') { throw 'A connection string do MongoDB precisa começar com mongodb:// ou mongodb+srv://' }
+if (-not $mongoUri -and $MongoHost -and $MongoUser -and $MongoPasswordFromClipboard) {
+    Write-Host ''
+    Write-Host '   AGUARDANDO A SENHA DO MONGODB (nao precisa digitar nada aqui).' -ForegroundColor Yellow
+    Write-Host '   No site do Atlas, na tela do usuario do banco, clique em:' -ForegroundColor Yellow
+    Write-Host '     1) Autogenerate Secure Password   2) Copy   3) Update User' -ForegroundColor Yellow
+    Write-Host '   Assim que a senha copiada funcionar, o deploy continua sozinho.'
+    $deadline = (Get-Date).AddMinutes(30)
+    $lastTried = $null
+    while (-not $mongoUri -and (Get-Date) -lt $deadline) {
+        Start-Sleep -Seconds 4
+        $clip = $null
+        try { $clip = Get-Clipboard -Raw -ErrorAction Stop } catch { }
+        if (-not $clip) { continue }
+        $clip = "$clip".Trim()
+        # só tenta o que tem cara de senha gerada: sem espaços e de tamanho razoável
+        if ($clip.Length -lt 8 -or $clip.Length -gt 80 -or $clip -match '\s') { continue }
+        if ($clip -ne $lastTried) { Write-Host '   senha copiada detectada, testando a conexao...' }
+        $candidate = "mongodb+srv://$([uri]::EscapeDataString($MongoUser)):$([uri]::EscapeDataString($clip))@$MongoHost/?retryWrites=true&w=majority&appName=ConectaStore"
+        if (Test-MongoUri $candidate ($clip -eq $lastTried)) {
+            Write-Host '   conexao ok.' -ForegroundColor Green
+            $mongoUri = $candidate
+        }
+        elseif ($clip -ne $lastTried) {
+            Write-Host '   ainda nao conectou - falta clicar em Update User no Atlas (sigo tentando a cada poucos segundos).' -ForegroundColor DarkYellow
+        }
+        $lastTried = $clip
+        $clip = $null
+    }
+    if (-not $mongoUri) { throw 'Nao recebi uma senha valida do MongoDB em 30 minutos. Rode o script de novo.' }
+}
+while (-not $mongoUri -and $MongoHost -and $MongoUser) {
+    $typedPassword = (ConvertTo-PlainText (Read-Host -AsSecureString "Senha do usuario $MongoUser no MongoDB Atlas (cole e tecle Enter - nao aparece na tela)")).Trim()
+    if ($typedPassword.Length -lt 6) {
+        Write-Host '   Isso nao parece a senha (veio curta demais). Copie a senha no Atlas e cole de novo.' -ForegroundColor Red
+        continue
+    }
+    $candidate = "mongodb+srv://$([uri]::EscapeDataString($MongoUser)):$([uri]::EscapeDataString($typedPassword))@$MongoHost/?retryWrites=true&w=majority&appName=ConectaStore"
+    $typedPassword = $null
+    Write-Host '   testando a conexao com o MongoDB Atlas...'
+    if (Test-MongoUri $candidate) {
+        Write-Host '   conexao ok.' -ForegroundColor Green
+        $mongoUri = $candidate
+    }
+    else {
+        Write-Host '   Nao consegui conectar com essa senha. Confira no Atlas se a senha foi salva (botao Update User) e cole de novo.' -ForegroundColor Red
+    }
+}
+while (-not $mongoUri) {
+    $typed = (ConvertTo-PlainText (Read-Host -AsSecureString 'Connection string do MongoDB Atlas (mongodb+srv://...) - a digitação fica oculta')).Trim()
+    if ($typed -notmatch '^mongodb(\+srv)?://') {
+        Write-Host '   Isso não parece uma connection string: ela começa com mongodb+srv:// . Tente de novo.' -ForegroundColor Red
+    }
+    elseif ($typed -match '<password>|<db_password>') {
+        Write-Host '   A connection string ainda está com <password>: troque pela senha do usuário do banco e cole de novo.' -ForegroundColor Red
+    }
+    else { $mongoUri = $typed }
+}
 
 # Segredos novos a cada execução (todos os serviços são atualizados juntos, então continuam combinando).
 $sqlPassword = (New-RandomSecret 28) + 'aZ9'
@@ -202,6 +295,7 @@ $produtosKey = New-RandomSecret
 $pedidosKey = New-RandomSecret
 $gatewaySecret = New-RandomSecret
 
+$script:runStamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmss')
 $script:workDir = Join-Path ([IO.Path]::GetTempPath()) ("pjbl-deploy-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $script:workDir | Out-Null
 
@@ -303,13 +397,16 @@ try {
         try {
             & npm ci --omit=dev --no-audit --no-fund; if ($LASTEXITCODE -ne 0) { throw 'npm ci --omit=dev falhou' }
             # tar do Windows gera zip com barras normais (o Compress-Archive do PowerShell 5 usa "\" e quebra no Linux)
-            & tar.exe -a -c -f ..\function.zip *; if ($LASTEXITCODE -ne 0) { throw 'não consegui gerar o zip da Function' }
+            & tar.exe -a -c -f ..\function.zip dist host.json package.json node_modules; if ($LASTEXITCODE -ne 0) { throw 'não consegui gerar o zip da Function' }
         }
         finally { Pop-Location }
         Invoke-Az functionapp deployment source config-zip --name $names.function --resource-group $ResourceGroup `
             --src (Join-Path $script:workDir 'function.zip') --output none
     }
-    $functionHost = Invoke-Az functionapp show --name $names.function --resource-group $ResourceGroup --query defaultHostName -o tsv
+    # No plano Flex Consumption o hostname vem em properties.defaultHostName (nos planos antigos, em defaultHostName)
+    $functionHost = Invoke-Az functionapp show --name $names.function --resource-group $ResourceGroup --query 'properties.defaultHostName || defaultHostName' -o tsv
+    if (-not "$functionHost".Trim()) { $functionHost = "$($names.function).azurewebsites.net" }
+    $functionHost = "$functionHost".Trim()
     $urls.function = "https://$functionHost"
     $functionKey = Invoke-Az functionapp keys list --name $names.function --resource-group $ResourceGroup --query functionKeys.default -o tsv
 
