@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Conecta Store — Entrega 3 (ARC42, C4, Canvas e evidências)</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; @bottom-center { content: counter(page); font: 9pt 'Segoe UI', Arial, sans-serif; color: #6b7785; } }
+  @page capa { margin: 0; @bottom-center { content: none; } }
+  @page paisagem { size: A4 landscape; margin: 12mm 12mm 16mm 12mm; }
+
+  * { box-sizing: border-box; }
+  html { font: 10.4pt/1.5 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; color: #1f2a37; }
+  body { margin: 0; }
+  h1, h2, h3, h4 { color: #12395f; line-height: 1.25; break-after: avoid; }
+  h1 { font-size: 20pt; margin: 0 0 10pt; padding-bottom: 6pt; border-bottom: 2.5pt solid #1565b0; break-before: page; }
+  h2 { font-size: 14pt; margin: 20pt 0 6pt; }
+  h3 { font-size: 11.5pt; margin: 14pt 0 4pt; }
+  h4 { font-size: 10.4pt; margin: 10pt 0 2pt; }
+  p { margin: 0 0 7pt; text-align: justify; hyphens: auto; }
+  ul, ol { margin: 0 0 7pt; padding-left: 16pt; }
+  li { margin-bottom: 2pt; }
+  a { color: #0f5ea8; text-decoration: none; word-break: break-all; }
+  code, .mono { font: 9pt Consolas, 'Courier New', monospace; background: #f0f4f8; padding: 0 2pt; border-radius: 2pt; }
+  pre { font: 8.4pt/1.4 Consolas, 'Courier New', monospace; background: #f4f6f9; border: 0.5pt solid #d5dde6; border-radius: 3pt; padding: 7pt 9pt; white-space: pre-wrap; break-inside: avoid; margin: 0 0 8pt; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9.2pt; }
+  th { background: #12395f; color: #fff; text-align: left; padding: 4pt 6pt; font-weight: 600; }
+  td { padding: 4pt 6pt; border-bottom: 0.5pt solid #d5dde6; vertical-align: top; }
+  tr { break-inside: avoid; }
+  tbody tr:nth-child(even) td { background: #f6f9fc; }
+  .nota { background: #eef5fc; border-left: 3pt solid #1565b0; padding: 6pt 9pt; margin: 6pt 0 10pt; font-size: 9.6pt; break-inside: avoid; }
+  .pendente { background: #fde8e8; color: #9b1c1c; padding: 0 3pt; border-radius: 2pt; font-size: 9pt; }
+  .legenda, figcaption { font-size: 8.8pt; color: #566474; text-align: center; margin-top: 3pt; }
+  figure { margin: 8pt 0 12pt; break-inside: avoid; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figure.print img { max-width: 100%; max-height: 225mm; border: 0.5pt solid #c6d0db; border-radius: 3pt; }
+  figure.print.faltando div { border: 1.2pt dashed #c98a8a; color: #9b1c1c; background: #fdf3f3; padding: 22pt 10pt; border-radius: 4pt; }
+  .paisagem { page: paisagem; break-before: page; }
+  .paisagem figure svg { max-height: 150mm; width: auto; max-width: 100%; }
+  h1.junto { break-before: auto; margin-top: 26pt; }
+  .paisagem h2 { margin-top: 0; }
+
+  /* capa */
+  .capa { page: capa; height: 297mm; padding: 34mm 22mm 20mm; background: linear-gradient(160deg, #0b2f52 0%, #1565b0 70%, #2f7fc8 100%); color: #fff; display: flex; flex-direction: column; }
+  .capa .selo { font-size: 10.5pt; letter-spacing: 2.2pt; text-transform: uppercase; opacity: .85; }
+  .capa .titulo { font-size: 40pt; font-weight: 700; line-height: 1.05; margin: 14mm 0 5mm; }
+  .capa .sub { font-size: 15pt; font-weight: 300; max-width: 150mm; }
+  .capa .conteudo { margin-top: 12mm; font-size: 11pt; opacity: .93; }
+  .capa .conteudo span { display: inline-block; border: 0.6pt solid rgba(255,255,255,.55); border-radius: 12pt; padding: 2pt 9pt; margin: 0 4pt 5pt 0; }
+  .capa .rodape { margin-top: auto; font-size: 11pt; }
+  .capa .rodape h4 { color: #fff; font-size: 10pt; letter-spacing: 1.5pt; text-transform: uppercase; opacity: .8; margin: 0 0 4pt; }
+  .capa .rodape ul { list-style: none; padding: 0; margin: 0 0 8mm; font-size: 12.5pt; }
+  .capa .pendente { background: #fff; }
+
+  .sumario { columns: 2; column-gap: 12mm; font-size: 9.8pt; }
+  .sumario h4 { margin-top: 0; }
+  .sumario ol, .sumario ul { margin-bottom: 9pt; }
+  .col2 { columns: 2; column-gap: 9mm; }
+  .adr { border: 0.5pt solid #c6d0db; border-radius: 4pt; padding: 6pt 9pt; margin: 0 0 7pt; break-inside: avoid; }
+  .adr h4 { margin: 0 0 3pt; }
+  .adr p { margin-bottom: 3pt; text-align: left; }
+  .adr b { color: #12395f; }
+
+  /* canvas */
+  .canvas { display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: minmax(40mm, auto); gap: 2.2mm; font-size: 8.5pt; line-height: 1.35; }
+  .canvas > div { border: 0.7pt solid #1565b0; border-radius: 4pt; padding: 4pt 6pt; background: #fbfdff; }
+  .canvas h4 { margin: 0 0 3pt; font-size: 9pt; color: #fff; background: #1565b0; margin: -4pt -6pt 4pt; padding: 3pt 6pt; border-radius: 3pt 3pt 0 0; }
+  .canvas ul { padding-left: 11pt; margin: 0; }
+  .canvas li { margin-bottom: 1.5pt; }
+  .canvas .w2 { grid-column: span 2; }
+  .canvas .w3 { grid-column: span 3; }
+  .ok { color: #166534; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ CAPA -->
+<section class="capa">
+  <div class="selo">Projeto PJBL — Arquitetura Completa · Entrega 3</div>
+  <div class="titulo">Conecta Store</div>
+  <div class="sub">Gestão de produtos, estoque e pedidos em uma arquitetura distribuída com microfrontend, API Gateway, BFF, microserviços e Azure Functions.</div>
+  <div class="conteudo">
+    <span>ARC42</span><span>C4 Model</span><span>Canvas</span><span>Prints e evidências</span><span>Links da entrega</span>
+  </div>
+  <div class="rodape">
+    <h4>Alunos</h4>
+    <ul>{{ALUNOS_HTML}}</ul>
+    <div>{{DATA}}</div>
+  </div>
+</section>
+
+<!-- ============================================================ LINKS -->
+<h1>Links da entrega</h1>
+<p>Tudo o que foi publicado está nesta página. Os mesmos links aparecem no README de cada repositório.</p>
+
+<h3>Aplicação na nuvem</h3>
+<table>
+  <tr><th style="width:34%">O quê</th><th>Endereço</th></tr>
+  <tr><td><b>Frontend</b> (microfrontend)</td><td>[[link:URL_FRONTEND]]</td></tr>
+  <tr><td><b>API Gateway</b> (Azure API Management)</td><td>[[link:URL_GATEWAY]]<br><span class="legenda">exige o cabeçalho <code>Ocp-Apim-Subscription-Key</code>; sem ele responde 401</span></td></tr>
+  <tr><td><b>Vídeo no YouTube</b> (não listado)</td><td>[[link:URL_VIDEO]]</td></tr>
+</table>
+
+<h3>Swagger e documentação das APIs</h3>
+<table>
+  <tr><th style="width:34%">Serviço</th><th>Endereço</th></tr>
+  <tr><td>Swagger do <b>BFF</b></td><td>[[link:URL_BFF|/docs]]</td></tr>
+  <tr><td>Swagger do <b>ms-produtos</b> (MongoDB)</td><td>[[link:URL_MS_PRODUTOS|/docs]]</td></tr>
+  <tr><td>Swagger do <b>ms-pedidos</b> (Azure SQL)</td><td>[[link:URL_MS_PEDIDOS|/docs]]</td></tr>
+  <tr><td><b>Eventos</b> (AsyncAPI — "Swagger de eventos")</td><td>[[link:URL_MS_PEDIDOS|/events/docs]]</td></tr>
+  <tr><td>Swagger da <b>Azure Function</b></td><td>[[link:URL_FUNCTION|/api/docs]]</td></tr>
+</table>
+
+<h3>Repositórios no GitHub (públicos)</h3>
+<table>
+  <tr><th style="width:34%">Projeto</th><th>Repositório</th></tr>
+  <tr><td>Microfrontend</td><td>[[github:pjbl-microfrontend]]</td></tr>
+  <tr><td>BFF</td><td>[[github:pjbl-bff]]</td></tr>
+  <tr><td>Microserviço Mongo (produtos)</td><td>[[github:pjbl-ms-produtos]]</td></tr>
+  <tr><td>Microserviço SQL (pedidos)</td><td>[[github:pjbl-ms-pedidos]]</td></tr>
+  <tr><td>Azure Function</td><td>[[github:pjbl-function]]</td></tr>
+  <tr><td>Arquitetura (este documento, gateway, deploy)</td><td>[[github:pjbl-arquitetura]]</td></tr>
+</table>
+
+<h3>Imagens no Docker Hub</h3>
+<table>
+  <tr><th style="width:34%">Serviço</th><th>Imagem</th></tr>
+  <tr><td>BFF</td><td>[[dockerhub:pjbl-bff]]</td></tr>
+  <tr><td>ms-produtos</td><td>[[dockerhub:pjbl-ms-produtos]]</td></tr>
+  <tr><td>ms-pedidos</td><td>[[dockerhub:pjbl-ms-pedidos]]</td></tr>
+</table>
+<p class="nota">O enunciado dá como exemplo o nome <code>dockerhubuser/pjbl/bff:v1</code>. O Docker Hub não aceita repositório aninhado (<code>usuario/pasta/imagem</code>), então usamos o nome do projeto como prefixo: <code>usuario/pjbl-bff:v1</code>. A Azure Function e o front não viram imagem: a Function roda no plano Flex Consumption e o front é um site estático.</p>
+
+<h2>Sumário</h2>
+<div class="sumario">
+  <h4>Parte I — ARC42</h4>
+  <ol>
+    <li>Introdução e objetivos</li><li>Restrições</li><li>Contexto e escopo</li><li>Estratégia de solução</li>
+    <li>Visão de blocos de construção</li><li>Visão de runtime</li><li>Visão de implantação</li><li>Conceitos transversais</li>
+    <li>Decisões arquiteturais</li><li>Requisitos de qualidade</li><li>Riscos e dívidas técnicas</li><li>Glossário</li>
+  </ol>
+  <h4>Parte II — C4 Model</h4>
+  <ul><li>Nível 1: Contexto</li><li>Nível 2: Containers</li><li>Nível 3: Componentes (BFF, ms-pedidos, ms-produtos, Function)</li></ul>
+  <h4>Parte III — Canvas do projeto</h4>
+  <h4>Parte IV — Prints e evidências</h4>
+  <ul><li>Swagger do BFF e dos microserviços</li><li>Eventos (AsyncAPI)</li><li>Frontend funcionando</li><li>API Gateway</li><li>Docker Hub, GitHub Actions e testes</li></ul>
+  <h4>Parte V — Conferência com o enunciado</h4>
+</div>
+
+<!-- ============================================================ PARTE I -->
+<h1>Parte I — ARC42 · 1. Introdução e objetivos</h1>
+
+<h2>1.1 Visão geral</h2>
+<p>O <b>Conecta Store</b> é um sistema de retaguarda para uma loja pequena: cadastro de produtos, controle de estoque por movimentações e registro de pedidos de clientes, com um painel que resume a operação. O domínio é simples de propósito. O objetivo do projeto não é o negócio em si, e sim <b>demonstrar uma arquitetura distribuída completa funcionando na nuvem</b>: microfrontend, API Gateway, BFF, dois microserviços com bancos diferentes e uma Azure Function, ligados por chamadas síncronas e por eventos.</p>
+<p>Escolhemos produtos e pedidos porque os dois domínios precisam um do outro de um jeito que justifica cada peça: o pedido depende do preço e do estoque do produto (o que dá trabalho de verdade ao BFF) e a venda precisa baixar o estoque (o que dá um motivo real para usar eventos em vez de uma chamada direta entre microserviços).</p>
+
+<h2>1.2 Requisitos principais</h2>
+<table>
+  <tr><th style="width:5%">#</th><th style="width:38%">Requisito do enunciado</th><th>Como foi atendido</th></tr>
+  <tr><td>R1</td><td>Microfrontend (React ou Angular) que consome só o BFF</td><td>React + Vite com Module Federation: um <i>shell</i> e dois <i>remotes</i> (Produtos e Pedidos). O único endereço que o front conhece é o do API Gateway.</td></tr>
+  <tr><td>R2</td><td>BFF em Node.js com agregação, proxy de CRUD e chamada à Function</td><td>Node + Express. <code>GET /aggregated-data</code> consulta os dois microserviços em paralelo e a Function, e devolve um JSON só. Proxy do CRUD e criação de pedido orquestrada.</td></tr>
+  <tr><td>R3</td><td>Microserviço 1 com MongoDB Atlas, CRUD e Swagger</td><td><b>ms-produtos</b>: produtos e movimentações de estoque no Atlas (M0). Swagger em <code>/docs</code>.</td></tr>
+  <tr><td>R4</td><td>Microserviço 2 com Azure SQL, CRUD e Swagger</td><td><b>ms-pedidos</b>: pedidos, itens e outbox no Azure SQL (oferta gratuita). Swagger em <code>/docs</code>.</td></tr>
+  <tr><td>R5</td><td>Azure Function com HTTP Trigger / Message Trigger</td><td>Os dois: HTTP Trigger que calcula indicadores e Queue Trigger que consome eventos de pedido.</td></tr>
+  <tr><td>R6</td><td>API Gateway com roteamento, segurança e entrada central</td><td>Azure API Management (Consumption): subscription key, rate limit, CORS e segredo que impede acesso direto ao BFF.</td></tr>
+  <tr><td>R7</td><td>Event-Driven Architecture</td><td>Transactional Outbox no ms-pedidos → Azure Storage Queue → Function → movimentação de estoque no ms-produtos, com idempotência.</td></tr>
+  <tr><td>R8</td><td>Clean Architecture e Vertical Slice</td><td>Domain / Application / Infrastructure / API em todos os backends; uma pasta por caso de uso (<code>CreateOrder</code>, <code>GetOrder</code>...).</td></tr>
+  <tr><td>R9</td><td>Testes unitários e de arquitetura</td><td>{{dado:testes.total}} testes automatizados somando os cinco projetos, incluindo testes de arquitetura em todos eles.</td></tr>
+  <tr><td>R10</td><td>Docker Hub, GitHub público, README, vídeo</td><td>Imagens publicadas pelo GitHub Actions; seis repositórios públicos com README; vídeo não listado no YouTube.</td></tr>
+</table>
+
+<h2>1.3 Metas de qualidade</h2>
+<table>
+  <tr><th style="width:5%">#</th><th style="width:22%">Meta</th><th>O que significa aqui</th></tr>
+  <tr><td>Q1</td><td><b>Manutenibilidade</b></td><td>Regras de dependência entre camadas verificadas por teste. Criar uma funcionalidade nova não exige mexer nas que existem.</td></tr>
+  <tr><td>Q2</td><td><b>Resiliência</b></td><td>Se um serviço cair, o painel continua mostrando o que os outros responderam. Nenhum evento de pedido se perde.</td></tr>
+  <tr><td>Q3</td><td><b>Consistência dos dados</b></td><td>Estoque nunca fica negativo e uma mensagem repetida não baixa o estoque duas vezes.</td></tr>
+  <tr><td>Q4</td><td><b>Segurança</b></td><td>Uma única porta de entrada. Nenhum segredo no código ou nos repositórios.</td></tr>
+  <tr><td>Q5</td><td><b>Observabilidade</b></td><td>Dá para seguir uma requisição do navegador até o banco pelo <code>x-correlation-id</code>.</td></tr>
+  <tr><td>Q6</td><td><b>Custo zero</b></td><td>Tudo roda em camadas gratuitas ou de consumo.</td></tr>
+</table>
+
+<h2>1.4 Partes interessadas</h2>
+<table>
+  <tr><th style="width:26%">Quem</th><th>O que espera</th></tr>
+  <tr><td>Professor / avaliador</td><td>Ver todos os itens do enunciado funcionando em URLs públicas, com documentação e código organizados.</td></tr>
+  <tr><td>Equipe ({{ALUNOS_INLINE}})</td><td>Um projeto que dê para entender, testar e publicar sem depender de máquina específica.</td></tr>
+  <tr><td>Operador da loja (usuário)</td><td>Cadastrar produtos, lançar pedidos e ver o estoque atualizado sem precisar saber o que acontece por trás.</td></tr>
+</table>
+
+<h1 class="junto">2. Restrições</h1>
+<table>
+  <tr><th style="width:24%">Tipo</th><th style="width:30%">Restrição</th><th>Consequência</th></tr>
+  <tr><td rowspan="5">Técnicas (enunciado)</td><td>BFF em Node.js</td><td>Usamos TypeScript/Node em todos os projetos, para ter uma linguagem só.</td></tr>
+  <tr><td>MongoDB Atlas (free) e Azure SQL (free)</td><td>Um banco por microserviço, sem compartilhamento. O banco SQL gratuito "dorme" após 15 min sem uso.</td></tr>
+  <tr><td>Azure Function com HTTP e/ou mensagem</td><td>Storage Queue como mensageria (já vem com a Function, sem custo).</td></tr>
+  <tr><td>Imagens no Docker Hub</td><td>Serviços empacotados em Docker; a plataforma precisa rodar imagem pública.</td></tr>
+  <tr><td>Demonstração só com URLs da nuvem</td><td>Tudo precisa estar publicado; nada de <i>localhost</i> no vídeo.</td></tr>
+  <tr><td rowspan="3">Organizacionais</td><td>Sem orçamento</td><td>Só camadas gratuitas e de consumo (Azure for Students, Atlas M0, GitHub, Docker Hub).</td></tr>
+  <tr><td>Equipe pequena e prazo de disciplina</td><td>Domínio enxuto; esforço concentrado na arquitetura, nos testes e na documentação.</td></tr>
+  <tr><td>Repositórios públicos</td><td>Nenhum segredo pode ir para o Git. Configuração só por variável de ambiente.</td></tr>
+  <tr><td rowspan="2">Convenções</td><td>Idioma</td><td>Código, rotas e campos em inglês; interface, documentação e comentários em português.</td></tr>
+  <tr><td>Estrutura</td><td>Mesma organização de pastas e os mesmos testes de arquitetura em todos os backends.</td></tr>
+</table>
+
+<h1>3. Contexto e escopo</h1>
+<h2>3.1 Contexto de negócio</h2>
+<p>O operador da loja usa o sistema pelo navegador. O sistema, por sua vez, depende de três serviços externos: o MongoDB Atlas (banco de produtos), o GitHub (código, automações e hospedagem do front) e o Docker Hub (imagens). O diagrama de contexto está na Parte II (C4 nível 1).</p>
+<table>
+  <tr><th style="width:22%">Parceiro</th><th style="width:39%">Entrada</th><th>Saída</th></tr>
+  <tr><td>Operador da loja</td><td>Cadastro de produtos, entradas de estoque, pedidos, mudanças de status</td><td>Listas, painel de indicadores, alertas de estoque, histórico de eventos</td></tr>
+  <tr><td>MongoDB Atlas</td><td>Consultas e gravações de produtos e movimentações</td><td>Documentos</td></tr>
+  <tr><td>GitHub</td><td><code>git push</code> da equipe</td><td>Resultado dos testes, imagens publicadas, site do front no ar</td></tr>
+  <tr><td>Docker Hub</td><td>Imagens enviadas pelo GitHub Actions</td><td>Imagens baixadas pelo Azure Container Apps</td></tr>
+</table>
+
+<h2>3.2 Contexto técnico</h2>
+<table>
+  <tr><th style="width:27%">Interface</th><th style="width:25%">Protocolo</th><th>Observação</th></tr>
+  <tr><td>Navegador → Gateway</td><td>HTTPS + JSON</td><td>Cabeçalho <code>Ocp-Apim-Subscription-Key</code>; CORS liberado pelo gateway</td></tr>
+  <tr><td>Gateway → BFF</td><td>HTTPS + JSON</td><td>Gateway injeta <code>x-gateway-secret</code>; sem ele o BFF responde 401</td></tr>
+  <tr><td>BFF → microserviços</td><td>HTTPS + JSON (REST)</td><td><code>x-api-key</code> interna e <code>x-correlation-id</code></td></tr>
+  <tr><td>BFF → Function</td><td>HTTPS (HTTP Trigger)</td><td><code>x-functions-key</code></td></tr>
+  <tr><td>ms-pedidos → fila</td><td>Azure Storage Queue</td><td>Mensagem JSON em Base64; contrato em AsyncAPI</td></tr>
+  <tr><td>Fila → Function</td><td>Queue Trigger</td><td>Até 5 tentativas; depois a mensagem vai para <code>order-events-poison</code></td></tr>
+  <tr><td>Function → ms-produtos</td><td>HTTPS + JSON</td><td><code>POST /products/{id}/stock-movements</code> com <code>eventId</code> (idempotência)</td></tr>
+  <tr><td>ms-produtos → Atlas</td><td>Driver MongoDB sobre TLS</td><td>—</td></tr>
+  <tr><td>ms-pedidos → Azure SQL</td><td>TDS criptografado (pacote <code>mssql</code>)</td><td>—</td></tr>
+</table>
+<p>O contrato campo a campo de cada interface está em <code>docs/contratos.md</code> no repositório <code>pjbl-arquitetura</code>.</p>
+
+<h1 class="junto">4. Estratégia de solução</h1>
+<table>
+  <tr><th style="width:27%">Problema</th><th style="width:30%">Decisão</th><th>Por quê</th></tr>
+  <tr><td>O front precisa de dados de três lugares</td><td>BFF com <code>/aggregated-data</code></td><td>Uma chamada só no navegador; o BFF paraleliza e tolera falha de uma das fontes.</td></tr>
+  <tr><td>Pedido precisa de preço e estoque do produto</td><td>Orquestração no BFF (<code>POST /orders</code>)</td><td>Os microserviços não se conhecem. O preço vem sempre do catálogo, nunca do navegador.</td></tr>
+  <tr><td>Venda precisa baixar o estoque</td><td>Evento <code>order.created</code> em vez de chamada direta</td><td>ms-pedidos funciona mesmo com o ms-produtos fora do ar; a baixa acontece quando ele voltar.</td></tr>
+  <tr><td>Gravar o pedido e publicar o evento sem perder nenhum dos dois</td><td>Transactional Outbox</td><td>Pedido e evento na mesma transação SQL. Um relay publica depois.</td></tr>
+  <tr><td>Fila entrega a mesma mensagem mais de uma vez</td><td>Idempotência por <code>eventId</code> no ms-produtos</td><td>Índice único no MongoDB; repetição responde 200 sem alterar o saldo.</td></tr>
+  <tr><td>Manter o código organizado em cinco projetos</td><td>Clean Architecture + Vertical Slice + testes de arquitetura</td><td>A regra vira teste automatizado, não combinado de equipe.</td></tr>
+  <tr><td>Ninguém deve pular o gateway</td><td>Segredo compartilhado gateway ↔ BFF</td><td>Mesmo sabendo a URL do BFF, a chamada direta dá 401.</td></tr>
+  <tr><td>Publicar sem depender da máquina de alguém</td><td>GitHub Actions + script de infraestrutura</td><td>Testes, imagens e deploy reproduzíveis.</td></tr>
+</table>
+
+<h1>5. Visão de blocos de construção</h1>
+<h2>5.1 Nível 1 — o sistema por dentro</h2>
+<p>O diagrama está na Parte II (C4 nível 2 — Containers). Cada bloco é um repositório e uma unidade de implantação.</p>
+<table>
+  <tr><th style="width:18%">Bloco</th><th style="width:40%">Responsabilidade</th><th>Interfaces principais</th></tr>
+  <tr><td><b>Microfrontend</b></td><td>Interface. <i>Shell</i> com o painel e a navegação; <i>remote</i> de Produtos; <i>remote</i> de Pedidos. Conversam entre si por eventos do navegador (<code>CustomEvent</code>).</td><td>Consome o gateway. Mostra um painel "Chamadas ao BFF" com correlation-id e tempos.</td></tr>
+  <tr><td><b>API Gateway</b></td><td>Entrada única: autenticação por chave, limite de requisições, CORS, roteamento para o BFF.</td><td><code>/conecta/*</code> → BFF</td></tr>
+  <tr><td><b>BFF</b></td><td>Agregação, orquestração da criação de pedido e proxy do CRUD. Não tem banco.</td><td><code>GET /aggregated-data</code>, <code>POST /orders</code>, <code>/products</code>, <code>/orders</code>, <code>/events</code></td></tr>
+  <tr><td><b>ms-produtos</b></td><td>Dono do catálogo e do estoque. O estoque só muda por movimentação.</td><td><code>/products</code>, <code>/products/{id}/stock-movements</code></td></tr>
+  <tr><td><b>ms-pedidos</b></td><td>Dono dos pedidos e da máquina de estados. Publica os eventos.</td><td><code>/orders</code>, <code>/orders/{id}/status</code>, <code>/events</code>, AsyncAPI</td></tr>
+  <tr><td><b>Azure Function</b></td><td>Cálculo dos indicadores (HTTP) e aplicação dos eventos no estoque (fila).</td><td><code>POST /api/indicators</code>, Queue Trigger <code>order-events</code></td></tr>
+</table>
+
+<h2>5.2 Nível 2 — por dentro de cada serviço</h2>
+<p>Os quatro backends seguem a mesma organização. Os diagramas de componentes estão na Parte II (C4 nível 3).</p>
+<pre>src/
+  domain/            entidades, regras e erros — TypeScript puro, nenhum pacote externo
+  application/
+    ports/           interfaces que a aplicação precisa (repositórios, gateways)
+    features/        um diretório por caso de uso (vertical slice)
+      CreateOrder/CreateOrder.ts        schema de validação + classe CreateOrderHandler
+      GetOrder/GetOrder.ts              ...
+  infrastructure/    implementações das portas: MongoDB, SQL, fila, clientes HTTP, config
+  api/
+    features/        adaptador HTTP fino de cada caso de uso
+      CreateOrder/CreateOrderEndpoint.ts
+    middlewares/     correlationId, apiKey, errorHandler
+  main.ts            composition root — o único arquivo que conhece infrastructure e api
+tests/
+  unit/  integration/  architecture/</pre>
+
+<table>
+  <tr><th style="width:18%">Serviço</th><th>Casos de uso (uma pasta cada)</th></tr>
+  <tr><td>BFF</td><td><code>GetAggregatedData</code>, <code>PlaceOrder</code>, <code>ProductsProxy</code>, <code>OrdersProxy</code>, <code>CheckHealth</code></td></tr>
+  <tr><td>ms-produtos</td><td><code>CreateProduct</code>, <code>ListProducts</code>, <code>GetProduct</code>, <code>UpdateProduct</code>, <code>DeleteProduct</code>, <code>RegisterStockMovement</code>, <code>ListStockMovements</code></td></tr>
+  <tr><td>ms-pedidos</td><td><code>CreateOrder</code>, <code>ListOrders</code>, <code>GetOrder</code>, <code>UpdateOrder</code>, <code>ChangeOrderStatus</code>, <code>DeleteOrder</code>, <code>ListOrderEvents</code>, <code>DispatchOrderEvents</code></td></tr>
+  <tr><td>Function</td><td><code>CalculateIndicators</code>, <code>ProcessOrderEvent</code></td></tr>
+</table>
+
+<h3>Regras de negócio que valem destacar</h3>
+<div class="col2">
+<ul>
+  <li><b>Produto:</b> SKU único, em maiúsculas; preço maior que zero; estoque nunca negativo; "estoque baixo" quando ≤ 5.</li>
+  <li><b>Estoque:</b> não é editável. Só muda por movimentação de ENTRADA ou SAÍDA, que fica no histórico com o saldo resultante.</li>
+  <li><b>Pedido:</b> de 1 a 20 itens, sem produto repetido, quantidade de 1 a 999; total calculado no servidor.</li>
+  <li><b>Status:</b> PENDENTE → PAGO ou CANCELADO; PAGO → ENVIADO ou CANCELADO; ENVIADO → ENTREGUE. ENTREGUE e CANCELADO são finais.</li>
+  <li><b>Edição:</b> dados do cliente só mudam com o pedido PENDENTE; itens nunca mudam.</li>
+  <li><b>Exclusão:</b> só pedido CANCELADO pode ser excluído.</li>
+  <li><b>Criação pelo BFF:</b> nome e preço vêm do catálogo; estoque insuficiente bloqueia o pedido (409) dizendo quanto foi pedido e quanto há.</li>
+</ul>
+</div>
+
+<h1>6. Visão de runtime</h1>
+<p>Dois cenários resumem o comportamento do sistema: a leitura agregada (síncrona) e a criação de pedido com baixa de estoque (síncrona até a resposta, assíncrona depois).</p>
+
+<section class="paisagem">
+<h2>6.1 Cenário 1 — Painel: GET /aggregated-data</h2>
+<figure><!--DIAGRAMA:runtime-1-aggregated-data--><figcaption>O BFF é o único que sabe quantas fontes existem. O front faz uma chamada e recebe um JSON.</figcaption></figure>
+</section>
+
+<section class="paisagem">
+<h2>6.2 Cenário 2 — Pedido criado e estoque baixado por evento</h2>
+<figure><!--DIAGRAMA:runtime-2-pedido-evento--><figcaption>Passos 1 a 5 são síncronos; de 6 a 9 (em laranja) acontecem depois, sem o usuário esperar.</figcaption></figure>
+</section>
+
+<h2>6.3 O que acontece quando algo falha</h2>
+<table>
+  <tr><th style="width:36%">Situação</th><th>Comportamento</th></tr>
+  <tr><td>ms-produtos (ou ms-pedidos) fora do ar durante o <code>/aggregated-data</code></td><td>Resposta 200 com <code>partial: true</code>, o bloco daquela fonte como <code>null</code> e o motivo em <code>sources</code>. O painel mostra o aviso e o restante dos dados.</td></tr>
+  <tr><td>Function fora do ar</td><td>Produtos e pedidos aparecem normalmente; os indicadores ficam indisponíveis.</td></tr>
+  <tr><td>Microserviço fora do ar numa operação de CRUD</td><td>BFF responde 502 <code>UPSTREAM_UNAVAILABLE</code> (504 em timeout), no formato padrão de erro.</td></tr>
+  <tr><td>Fila indisponível na hora de publicar</td><td>O pedido já está gravado. O evento fica PENDENTE/FALHOU no outbox e o relay tenta de novo. <code>GET /events</code> mostra a situação.</td></tr>
+  <tr><td>ms-produtos fora do ar quando a Function processa o evento</td><td>A Function relança o erro; a fila reentrega até 5 vezes e depois move para a fila <i>poison</i>.</td></tr>
+  <tr><td>Mesma mensagem entregue duas vezes</td><td>ms-produtos reconhece o <code>eventId</code> e responde 200 <code>duplicate: true</code>, sem mexer no saldo.</td></tr>
+  <tr><td>Dois cancelamentos simultâneos do mesmo pedido</td><td>Atualização condicional (<code>WHERE Status = @esperado</code>): só um vence; o outro recebe 409. Sai um único evento de devolução.</td></tr>
+  <tr><td>Banco SQL gratuito "dormindo"</td><td>O ms-pedidos tenta de novo por alguns segundos; se não der, responde 503 com <code>Retry-After</code> e o front tenta outra vez.</td></tr>
+</table>
+
+<h1>7. Visão de implantação</h1>
+<section class="paisagem" style="break-before: auto">
+<figure><!--DIAGRAMA:implantacao--><figcaption>Toda a parte Azure é criada pelo script <code>infra/deploy-azure.ps1</code>, que pode ser executado de novo sem duplicar nada.</figcaption></figure>
+</section>
+
+<h2>7.1 Onde cada coisa roda</h2>
+<table>
+  <tr><th style="width:20%">Parte</th><th style="width:33%">Serviço de nuvem</th><th style="width:20%">Camada</th><th>Observação</th></tr>
+  <tr><td>Microfrontend</td><td>GitHub Pages</td><td>Gratuita</td><td>Site estático único: <code>/</code>, <code>/produtos/</code>, <code>/pedidos/</code></td></tr>
+  <tr><td>API Gateway</td><td>Azure API Management</td><td>Consumption</td><td>1 milhão de chamadas/mês sem custo</td></tr>
+  <tr><td>BFF e microserviços</td><td>Azure Container Apps</td><td>Consumo</td><td>Imagens do Docker Hub; 0 a 1 réplica</td></tr>
+  <tr><td>Function</td><td>Azure Functions</td><td>Flex Consumption</td><td>Node 22; o plano Consumption em Linux está sendo aposentado</td></tr>
+  <tr><td>Fila</td><td>Azure Storage Queue</td><td>Uso mínimo</td><td>Mesma conta de armazenamento da Function</td></tr>
+  <tr><td>Banco de pedidos</td><td>Azure SQL Database</td><td>Oferta gratuita serverless</td><td>Pausa após 15 min sem uso; nunca gera cobrança (AutoPause)</td></tr>
+  <tr><td>Banco de produtos</td><td>MongoDB Atlas</td><td>M0 (gratuita)</td><td>—</td></tr>
+  <tr><td>Imagens</td><td>Docker Hub</td><td>Gratuita</td><td>Repositórios públicos</td></tr>
+</table>
+<p class="nota">O enunciado fala em "Azure SQL Database (Free 1 DTU)". Hoje a oferta gratuita da Azure para banco SQL é a <i>serverless</i> (100 mil vCore-segundos por mês), que é a que usamos. Para o projeto, o efeito é o mesmo: um Azure SQL gratuito.</p>
+
+<h2>7.2 Esteira de entrega</h2>
+<ol>
+  <li><b>Push na <code>main</code></b> de qualquer repositório dispara o GitHub Actions.</li>
+  <li><b>Job de testes:</b> checagem de tipos, testes unitários, de integração e de arquitetura, e build.</li>
+  <li><b>Job de publicação:</b> nos serviços com Docker, build e <i>push</i> da imagem (<code>v1</code>, <code>latest</code>, <code>sha-…</code>); no front, deploy no GitHub Pages; na Function, deploy do pacote.</li>
+  <li><b>Infraestrutura:</b> <code>infra/deploy-azure.ps1</code> cria ou atualiza os recursos, gera os segredos e aponta os Container Apps para as imagens.</li>
+</ol>
+
+<h1>8. Conceitos transversais</h1>
+
+<h2>8.1 Clean Architecture e Vertical Slice, garantidas por teste</h2>
+<p>As dependências sempre apontam para dentro: <b>API → Application → Domain</b> e <b>Infrastructure → Application → Domain</b>. API e Infrastructure não se conhecem; quem liga as duas é o <code>main.ts</code>. Dentro de Application e API, o código é organizado por funcionalidade, e uma funcionalidade não importa outra.</p>
+<p>Para isso não depender de disciplina, cada projeto tem testes de arquitetura próprios: um pequeno scanner lê os <code>import</code> de todos os arquivos e verifica as regras abaixo. Se alguém quebrar uma delas, a esteira falha.</p>
+<table>
+  <tr><th style="width:44%">Regra verificada</th><th>Exemplo de violação que o teste pega</th></tr>
+  <tr><td>Domain não importa nenhuma outra camada nem pacotes</td><td><code>import express from 'express'</code> em <code>domain/</code></td></tr>
+  <tr><td>Application só depende do Domain (pacotes: só <code>zod</code>)</td><td>caso de uso importando o repositório SQL concreto</td></tr>
+  <tr><td>API não importa Infrastructure, e vice-versa</td><td>endpoint lendo <code>infrastructure/config</code></td></tr>
+  <tr><td>Driver de banco, SDK de fila e <code>fetch</code> só na Infrastructure</td><td><code>mongodb</code> ou <code>mssql</code> importado num handler</td></tr>
+  <tr><td>Uma feature não importa outra</td><td><code>CreateOrder</code> importando <code>GetOrder</code></td></tr>
+  <tr><td>Toda feature tem <code>&lt;Feature&gt;Handler</code> e <code>&lt;Feature&gt;Endpoint</code></td><td>pasta de feature sem adaptador HTTP</td></tr>
+</table>
+<p>Os próprios testes plantam violações em arquivos fictícios e conferem que cada regra reclama — assim sabemos que um "passou" não é falso positivo. No front, o teste equivalente garante que os <i>remotes</i> não importam um do outro e que nenhuma tela usa <code>fetch</code> direto.</p>
+
+<h2>8.2 Event-driven: outbox, fila e idempotência</h2>
+<ul>
+  <li><b>Transactional Outbox.</b> O ms-pedidos grava o pedido e o evento (tabela <code>OutboxMessages</code>) na mesma transação. Ou os dois existem, ou nenhum.</li>
+  <li><b>Relay.</b> Um componente do ms-pedidos lê os eventos pendentes e publica na fila. Ele é acionado logo depois do <i>commit</i> e só continua tentando enquanto houver evento pendente — não fica consultando o banco à toa, o que manteria o SQL gratuito acordado e gastaria a cota do mês.</li>
+  <li><b>Entrega pelo menos uma vez.</b> Uma mensagem pode chegar repetida; nunca se perde.</li>
+  <li><b>Consumidor idempotente.</b> Cada movimentação leva <code>eventId = "&lt;id do evento&gt;:&lt;id do produto&gt;"</code>. O ms-produtos tem índice único nesse campo.</li>
+  <li><b>Contrato documentado.</b> AsyncAPI 2.6 servido pelo ms-pedidos em <code>/events/docs</code>.</li>
+  <li><b>Consistência eventual assumida.</b> O estoque baixa alguns segundos depois do pedido. A resposta do BFF já avisa (<code>stock.mode: "event-driven"</code>) e o painel se atualiza sozinho.</li>
+</ul>
+
+<h2>8.3 Segurança</h2>
+<table>
+  <tr><th style="width:26%">Camada</th><th>Controle</th></tr>
+  <tr><td>Borda</td><td>Subscription key obrigatória no gateway; limite de 120 chamadas/minuto por chave; CORS; HTTPS em tudo.</td></tr>
+  <tr><td>Gateway → BFF</td><td>Cabeçalho <code>x-gateway-secret</code> (Named Value secreto do APIM). O BFF compara em tempo constante e recusa quem não tem.</td></tr>
+  <tr><td>BFF → serviços</td><td><code>x-api-key</code> própria de cada microserviço; <code>x-functions-key</code> na Function.</td></tr>
+  <tr><td>Aplicação</td><td>Validação de toda entrada (zod); consultas SQL parametrizadas; limite de tamanho do corpo; <code>helmet</code>; rate limit também no BFF; container sem usuário root.</td></tr>
+  <tr><td>Segredos</td><td>Só em variáveis de ambiente / secrets do Container Apps e do GitHub. Gerados pelo script de deploy, nunca impressos nem versionados. Cabeçalhos sensíveis mascarados nos logs.</td></tr>
+</table>
+<p class="nota">Limitação conhecida: a subscription key vai dentro do JavaScript do front, então qualquer pessoa consegue vê-la. Ela identifica a aplicação e sustenta o limite de uso, mas não substitui login de usuário — que ficou fora do escopo (ver seção 11).</p>
+
+<h2>8.4 Observabilidade</h2>
+<ul>
+  <li><b>Correlation-id.</b> Toda requisição recebe um <code>x-correlation-id</code> (ou reaproveita o que veio). Ele segue do front ao BFF, aos microserviços, à Function e dentro do próprio evento.</li>
+  <li><b>Logs estruturados</b> em JSON (pino), com o correlation-id em cada linha.</li>
+  <li><b>Server-Timing.</b> O <code>/aggregated-data</code> informa o tempo de cada fonte, visível na aba <i>Network</i> do navegador e no painel "Chamadas ao BFF" do front.</li>
+  <li><b>Health checks.</b> <code>/health</code> em todos os serviços; o do BFF mostra a situação de cada dependência.</li>
+  <li><b>Eventos visíveis.</b> <code>GET /events</code> lista o outbox com status PUBLICADO, PENDENTE ou FALHOU.</li>
+</ul>
+
+<h2>8.5 Tratamento de erros</h2>
+<p>Todo erro, em qualquer serviço, tem o mesmo formato: <code>{ "error": { "code", "message", "details", "correlationId" } }</code>. As camadas internas só lançam exceções; um único <i>error handler</i> na API traduz para HTTP.</p>
+<table>
+  <tr><th style="width:12%">HTTP</th><th style="width:34%">Quando</th><th>Exemplos de <code>code</code></th></tr>
+  <tr><td>400</td><td>Entrada inválida</td><td><code>VALIDATION_ERROR</code> (com a lista de campos), <code>INVALID_JSON</code></td></tr>
+  <tr><td>401</td><td>Sem credencial</td><td><code>UNAUTHORIZED</code></td></tr>
+  <tr><td>404</td><td>Recurso não existe</td><td><code>PRODUCT_NOT_FOUND</code>, <code>ORDER_NOT_FOUND</code></td></tr>
+  <tr><td>409</td><td>Conflito com o estado atual</td><td><code>SKU_ALREADY_EXISTS</code>, <code>INSUFFICIENT_STOCK</code>, <code>INVALID_STATUS_TRANSITION</code>, <code>ORDER_NOT_DELETABLE</code></td></tr>
+  <tr><td>422</td><td>Regra de negócio</td><td><code>DUPLICATED_ITEM</code>, <code>PRODUCT_NOT_FOUND</code> (na criação do pedido)</td></tr>
+  <tr><td>502 / 504</td><td>Serviço de trás indisponível / lento</td><td><code>UPSTREAM_UNAVAILABLE</code>, <code>UPSTREAM_TIMEOUT</code></td></tr>
+</table>
+
+<h2>8.6 Testes</h2>
+<table>
+  <tr><th style="width:20%">Projeto</th><th style="width:12%">Testes</th><th>O que cobrem</th></tr>
+  <tr><td>ms-produtos</td><td>{{dado:testes.produtos}}</td><td>Domínio, casos de uso, HTTP, arquitetura e integração com MongoDB real (inclusive 10 baixas concorrentes com estoque 5).</td></tr>
+  <tr><td>ms-pedidos</td><td>{{dado:testes.pedidos}}</td><td>Máquina de estados, outbox, relay, publicação na fila, HTTP, arquitetura. Inclui 18 testes de integração com SQL Server real, que só rodam quando há um banco disponível.</td></tr>
+  <tr><td>Function</td><td>{{dado:testes.function}}</td><td>Cálculo dos indicadores, tradução de eventos, retry x descarte, cliente HTTP, arquitetura.</td></tr>
+  <tr><td>BFF</td><td>{{dado:testes.bff}}</td><td>Agregação e falha parcial, pedido orquestrado, integração com servidores HTTP falsos (gateway secret, 502/504), arquitetura.</td></tr>
+  <tr><td>Microfrontend</td><td>{{dado:testes.front}}</td><td>Componentes (painel, formulários, pedido), cliente HTTP e arquitetura dos <i>remotes</i>.</td></tr>
+  <tr><td><b>Total</b></td><td><b>{{dado:testes.total}}</b></td><td>Rodam no GitHub Actions a cada <i>push</i> (os 18 de SQL real, sob demanda).</td></tr>
+</table>
+
+<h1>9. Decisões arquiteturais</h1>
+<div class="adr"><h4>ADR-01 — TypeScript e Node.js em todos os projetos</h4>
+<p><b>Contexto:</b> o enunciado pede Node no BFF e deixa os demais livres. <b>Decisão:</b> uma linguagem só, do front à Function. <b>Consequências:</b> mesma estrutura, mesmas ferramentas de teste e o mesmo scanner de arquitetura em todos os repositórios; qualquer pessoa da equipe mexe em qualquer serviço. Abrimos mão de mostrar outra plataforma (.NET, por exemplo).</p></div>
+<div class="adr"><h4>ADR-02 — Transactional Outbox para publicar eventos</h4>
+<p><b>Contexto:</b> gravar no banco e publicar na fila são duas operações; se uma falhar, pedido e estoque divergem. <b>Decisão:</b> gravar o evento numa tabela na mesma transação do pedido e publicar depois, por um relay. <b>Consequências:</b> nenhum evento se perde; em troca, a entrega pode se repetir, o que exige consumidor idempotente (ADR-03).</p></div>
+<div class="adr"><h4>ADR-03 — Idempotência no ms-produtos, com índice único</h4>
+<p><b>Contexto:</b> a fila entrega pelo menos uma vez. <b>Decisão:</b> cada movimentação leva um <code>eventId</code> e o MongoDB tem índice único parcial nesse campo. <b>Consequências:</b> a garantia fica no banco, então vale até com duas instâncias processando ao mesmo tempo. A baixa usa <code>$inc</code> condicional (<code>stock ≥ quantidade</code>), sem precisar de transação.</p></div>
+<div class="adr"><h4>ADR-04 — Azure Storage Queue em vez de Service Bus</h4>
+<p><b>Contexto:</b> precisávamos de mensageria gratuita. <b>Decisão:</b> Storage Queue, que usa a conta de armazenamento que a Function já exige. <b>Consequências:</b> custo praticamente zero e gatilho nativo. Não tem tópicos nem ordenação garantida, o que não faz falta com um único consumidor; se surgirem mais consumidores, o ponto de troca é só a classe publicadora.</p></div>
+<div class="adr"><h4>ADR-05 — Azure API Management em vez de AWS API Gateway</h4>
+<p><b>Contexto:</b> o enunciado cita o gateway da AWS como opção. <b>Decisão:</b> APIM na camada Consumption. <b>Consequências:</b> uma nuvem só, uma conta só (sem cartão) e as rotas importadas do OpenAPI do BFF. A definição equivalente para AWS está versionada em <code>gateway/aws/</code>, caso se queira trocar.</p></div>
+<div class="adr"><h4>ADR-06 — Azure Container Apps para BFF e microserviços</h4>
+<p><b>Contexto:</b> o enunciado exige imagens no Docker Hub. <b>Decisão:</b> Container Apps puxando as imagens públicas. <b>Consequências:</b> HTTPS e URL pública prontos, escala até zero (sem custo parado). A primeira chamada depois de um tempo ocioso demora alguns segundos.</p></div>
+<div class="adr"><h4>ADR-07 — Microfrontend com Module Federation num site só</h4>
+<p><b>Contexto:</b> "microfrontend" precisa ser mais que uma SPA comum. <b>Decisão:</b> <i>shell</i> + dois <i>remotes</i> carregados em tempo de execução, publicados como um único site estático. <b>Consequências:</b> cada <i>remote</i> tem build próprio e também abre sozinho; se um falhar, o resto continua. Em contrapartida, os <i>remotes</i> precisam de build para rodar localmente.</p></div>
+<div class="adr"><h4>ADR-08 — Validação de estoque no BFF, baixa por evento</h4>
+<p><b>Contexto:</b> o pedido não deveria ser aceito sem estoque, mas a baixa é assíncrona. <b>Decisão:</b> o BFF confere o estoque antes de criar o pedido; a baixa real acontece pelo evento. <b>Consequências:</b> boa experiência no caso comum. Dois pedidos simultâneos do último item podem ser aceitos; o segundo evento recebe 409 do ms-produtos e fica registrado como alerta (ver risco R2).</p></div>
+
+<h1 class="junto">10. Requisitos de qualidade</h1>
+<h2>10.1 Árvore de qualidade</h2>
+<div class="col2">
+<ul>
+  <li><b>Manutenibilidade</b><ul><li>dependências entre camadas</li><li>isolamento entre funcionalidades</li><li>cobertura por testes</li></ul></li>
+  <li><b>Confiabilidade</b><ul><li>tolerância a falha parcial</li><li>nenhum evento perdido</li><li>idempotência</li></ul></li>
+  <li><b>Segurança</b><ul><li>entrada única</li><li>segredos fora do código</li></ul></li>
+  <li><b>Observabilidade</b><ul><li>rastreio ponta a ponta</li><li>saúde por dependência</li></ul></li>
+  <li><b>Desempenho</b><ul><li>consultas em paralelo no BFF</li></ul></li>
+  <li><b>Custo</b><ul><li>camadas gratuitas</li></ul></li>
+</ul>
+</div>
+<h2>10.2 Cenários</h2>
+<table>
+  <tr><th style="width:6%">#</th><th style="width:36%">Estímulo</th><th style="width:34%">Resposta esperada</th><th>Como verificamos</th></tr>
+  <tr><td>C1</td><td>Um desenvolvedor importa o driver do banco dentro de um caso de uso</td><td>A esteira falha apontando arquivo e import</td><td>Testes de arquitetura</td></tr>
+  <tr><td>C2</td><td>ms-pedidos cai enquanto o painel está aberto</td><td>Painel mostra produtos, avisa que pedidos estão indisponíveis; HTTP 200</td><td>Teste de integração do BFF</td></tr>
+  <tr><td>C3</td><td>10 baixas simultâneas num produto com 5 unidades</td><td>5 aceitas, 5 recusadas, saldo final 0</td><td>Teste de integração com MongoDB</td></tr>
+  <tr><td>C4</td><td>A fila reentrega o mesmo evento</td><td>Estoque baixa uma vez só</td><td>Teste do ms-produtos e da Function</td></tr>
+  <tr><td>C5</td><td>Alguém chama o BFF direto, sem passar pelo gateway</td><td>401 <code>UNAUTHORIZED</code></td><td>Teste de integração do BFF; print na Parte IV</td></tr>
+  <tr><td>C6</td><td>Front tenta criar pedido com preço alterado</td><td>Preço enviado é ignorado; vale o do catálogo</td><td>Teste unitário do <code>PlaceOrder</code></td></tr>
+  <tr><td>C7</td><td>Usuário relata erro numa tela</td><td>Com o correlation-id mostrado na tela acham-se os logs de todos os serviços</td><td>Demonstração no vídeo</td></tr>
+</table>
+
+<h1 class="junto">11. Riscos e dívidas técnicas</h1>
+<table>
+  <tr><th style="width:6%">#</th><th style="width:34%">Risco / dívida</th><th style="width:12%">Impacto</th><th>O que fizemos ou faríamos</th></tr>
+  <tr><td>R1</td><td>Cold start: containers em escala zero e SQL gratuito pausado deixam a primeira chamada lenta</td><td>Médio</td><td>Timeout de 30 s no BFF, novas tentativas no ms-pedidos e no front. No dia da apresentação, subir com <code>-MinReplicas 1</code> e "aquecer" antes.</td></tr>
+  <tr><td>R2</td><td>Dois pedidos simultâneos do último item podem ser aceitos (a baixa é assíncrona)</td><td>Baixo</td><td>O estoque não fica negativo: o segundo evento é recusado e registrado. Evolução: reserva de estoque ou saga de compensação que cancela o pedido.</td></tr>
+  <tr><td>R3</td><td>Não há autenticação de usuário; a chave do gateway é visível no front</td><td>Médio</td><td>Aceitável para o escopo. Evolução: login com Entra ID / OAuth e validação de JWT no gateway.</td></tr>
+  <tr><td>R4</td><td>Cota mensal do SQL gratuito</td><td>Baixo</td><td>Relay sem consulta periódica; painel pausa a atualização automática com a aba oculta; banco em AutoPause (nunca cobra).</td></tr>
+  <tr><td>R5</td><td><code>/aggregated-data</code> traz no máximo 100 produtos e 100 pedidos</td><td>Baixo</td><td>Suficiente para a demonstração. Evolução: indicadores calculados no banco ou por projeção alimentada pelos eventos.</td></tr>
+  <tr><td>R6</td><td>Relay do outbox roda dentro do ms-pedidos (uma réplica)</td><td>Baixo</td><td>Limitamos a 1 réplica. Evolução: bloqueio de linha (<code>READPAST</code>) ou relay separado.</td></tr>
+  <tr><td>R7</td><td>Excluir um produto não verifica pedidos antigos que o citam</td><td>Baixo</td><td>O pedido guarda nome e preço da época, então continua íntegro. Evolução: inativar em vez de excluir.</td></tr>
+  <tr><td>R8</td><td>Mensagens na fila <i>poison</i> não têm tratamento automático</td><td>Baixo</td><td>Ficam guardadas para análise manual. Evolução: alerta e tela de reprocessamento.</td></tr>
+</table>
+
+<h1 class="junto">12. Glossário</h1>
+<table>
+  <tr><th style="width:24%">Termo</th><th>Significado no projeto</th></tr>
+  <tr><td>BFF</td><td><i>Backend for Frontend</i>: API feita sob medida para a interface, que junta e adapta os dados dos microserviços.</td></tr>
+  <tr><td>Microfrontend</td><td>Interface dividida em partes com build e publicação independentes, montadas no navegador.</td></tr>
+  <tr><td>Shell / remote</td><td>No Module Federation, o <i>shell</i> é a aplicação que hospeda; os <i>remotes</i> são as partes carregadas por ela.</td></tr>
+  <tr><td>API Gateway</td><td>Ponto único de entrada das APIs: autentica, limita e roteia.</td></tr>
+  <tr><td>Clean Architecture</td><td>Organização em camadas em que as regras de negócio não dependem de framework, banco ou interface.</td></tr>
+  <tr><td>Vertical Slice</td><td>Organização do código por funcionalidade (uma pasta por caso de uso), e não por tipo de arquivo.</td></tr>
+  <tr><td>Porta / adaptador</td><td>Porta é a interface que a aplicação define; adaptador é a implementação concreta (MongoDB, SQL, HTTP).</td></tr>
+  <tr><td>Composition root</td><td>Lugar único onde as implementações são criadas e ligadas (<code>main.ts</code>).</td></tr>
+  <tr><td>Transactional Outbox</td><td>Padrão que grava o evento no mesmo banco e transação do dado de negócio, para publicar depois com segurança.</td></tr>
+  <tr><td>Relay</td><td>Componente que lê o outbox e publica os eventos na fila.</td></tr>
+  <tr><td>Idempotência</td><td>Repetir a mesma operação não muda o resultado além da primeira vez.</td></tr>
+  <tr><td>Consistência eventual</td><td>Os dados de serviços diferentes ficam coerentes depois de um curto intervalo, não no mesmo instante.</td></tr>
+  <tr><td>Correlation-id</td><td>Identificador que acompanha uma requisição por todos os serviços, para juntar os logs.</td></tr>
+  <tr><td>Subscription key</td><td>Chave que o API Management exige em cada chamada.</td></tr>
+  <tr><td>Fila <i>poison</i></td><td>Fila para onde vão as mensagens que falharam em todas as tentativas.</td></tr>
+  <tr><td>AsyncAPI</td><td>Especificação para documentar eventos e mensagens, equivalente ao OpenAPI das APIs HTTP.</td></tr>
+  <tr><td>SKU</td><td>Código único do produto.</td></tr>
+</table>
+
+<!-- ============================================================ PARTE II -->
+<section class="paisagem">
+<h2>Parte II — C4 Model · Nível 1: Contexto</h2>
+<figure><!--DIAGRAMA:c4-1-contexto--></figure>
+</section>
+
+<section class="paisagem">
+<h2>C4 Model · Nível 2: Containers</h2>
+<figure><!--DIAGRAMA:c4-2-containers--></figure>
+</section>
+
+<section class="paisagem">
+<h2>C4 Model · Nível 3: Componentes do BFF</h2>
+<figure><!--DIAGRAMA:c4-3-componentes-bff--></figure>
+</section>
+
+<section class="paisagem">
+<h2>C4 Model · Nível 3: Componentes do ms-pedidos</h2>
+<figure><!--DIAGRAMA:c4-3-componentes-ms-pedidos--></figure>
+</section>
+
+<section class="paisagem">
+<h2>C4 Model · Nível 3: Componentes do ms-produtos</h2>
+<figure><!--DIAGRAMA:c4-3-componentes-ms-produtos--></figure>
+</section>
+
+<section class="paisagem">
+<h2>C4 Model · Nível 3: Componentes da Azure Function</h2>
+<figure><!--DIAGRAMA:c4-3-componentes-function--></figure>
+<p class="legenda">Os diagramas são gerados a partir de <code>docs/diagramas/definicoes.mjs</code> (repositório pjbl-arquitetura). Os arquivos SVG ficam em <code>docs/c4/</code> e o modelo em Structurizr DSL em <code>docs/c4/workspace.dsl</code>.</p>
+</section>
+
+<!-- ============================================================ PARTE III -->
+<section class="paisagem">
+<h2>Parte III — Canvas do projeto</h2>
+<div class="canvas">
+  <div class="w2"><h4>Objetivo</h4><ul><li>Construir e publicar uma aplicação distribuída completa (microfrontend, gateway, BFF, dois microserviços, Function) para gestão de produtos e pedidos.</li><li>Aplicar Clean Architecture, Vertical Slice e arquitetura orientada a eventos, com evidência por testes.</li></ul></div>
+  <div class="w2"><h4>Justificativa</h4><ul><li>Praticar, num caso pequeno e real, os padrões vistos na disciplina.</li><li>Produtos × pedidos obriga a integrar dois domínios, o que justifica BFF e eventos.</li></ul></div>
+  <div><h4>Partes interessadas</h4><ul><li>Professor (avaliador)</li><li>Equipe do projeto</li><li>Operador da loja (usuário)</li></ul></div>
+
+  <div><h4>Requisitos</h4><ul><li>CRUD de produtos e de pedidos</li><li><code>GET /aggregated-data</code></li><li>Eventos de pedido</li><li>Swagger em tudo</li><li>Gateway na entrada</li><li>Testes unitários e de arquitetura</li></ul></div>
+  <div><h4>Entregas</h4><ul><li>6 repositórios públicos</li><li>3 imagens no Docker Hub</li><li>Aplicação na nuvem</li><li>PDF (ARC42, C4, Canvas, prints)</li><li>Vídeo no YouTube</li></ul></div>
+  <div><h4>Premissas</h4><ul><li>Contas gratuitas disponíveis (Azure for Students, Atlas, GitHub, Docker Hub)</li><li>Volume baixo de dados</li><li>Um único tipo de usuário</li></ul></div>
+  <div><h4>Restrições</h4><ul><li>Custo zero</li><li>BFF em Node.js</li><li>MongoDB Atlas e Azure SQL gratuitos</li><li>Demonstração só com URLs públicas</li><li>Nenhum segredo no Git</li></ul></div>
+  <div><h4>Riscos</h4><ul><li>Cold start e banco pausado</li><li>Cota das camadas gratuitas</li><li>Consistência eventual do estoque</li><li>Região indisponível na assinatura de estudante</li></ul></div>
+
+  <div class="w2"><h4>Solução (arquitetura)</h4><ul><li>React + Module Federation → Azure API Management → BFF (Express) → ms-produtos (MongoDB Atlas), ms-pedidos (Azure SQL) e Azure Function.</li><li>Outbox → Storage Queue → Function → estoque, com idempotência.</li><li>TypeScript em tudo; GitHub Actions; Container Apps.</li></ul></div>
+  <div><h4>Equipe</h4><ul>{{ALUNOS_HTML}}</ul></div>
+  <div><h4>Linha do tempo</h4><ul><li>Entrega 1: proposta e contexto</li><li>Entrega 2: modelagem e C4 inicial</li><li>Entrega 3: implementação, nuvem, documentação e vídeo</li></ul></div>
+  <div><h4>Custos</h4><ul><li>GitHub, Docker Hub, Atlas M0: gratuito</li><li>Azure SQL: oferta gratuita</li><li>APIM, Functions, Container Apps: dentro da franquia de consumo</li><li><b>Total previsto: R$ 0</b></li></ul></div>
+
+  <div class="w3"><h4>Critérios de sucesso</h4><ul><li>Fluxo completo demonstrado na nuvem: produto → pedido → evento → estoque → painel.</li><li>Todos os testes passando na esteira, inclusive os de arquitetura.</li><li>Todos os itens do enunciado conferidos (Parte V).</li></ul></div>
+  <div class="w2"><h4>Fora do escopo</h4><ul><li>Login e perfis de usuário</li><li>Pagamento e emissão de nota</li><li>Alta disponibilidade e múltiplas regiões</li></ul></div>
+</div>
+</section>
+
+<!-- ============================================================ PARTE IV -->
+<h1>Parte IV — Prints e evidências</h1>
+<p>Todas as capturas foram feitas nas URLs públicas listadas no início do documento.</p>
+
+<h2>Swagger do BFF</h2>
+<!--PRINT:swagger-bff.png|Swagger UI do BFF, com o endpoint obrigatório GET /aggregated-data-->
+
+<h2>Swagger dos microserviços</h2>
+<!--PRINT:swagger-ms-produtos.png|Swagger UI do ms-produtos (MongoDB Atlas)-->
+<!--PRINT:swagger-ms-pedidos.png|Swagger UI do ms-pedidos (Azure SQL)-->
+
+<h2>Eventos e Azure Function</h2>
+<!--PRINT:asyncapi-eventos.png|Documentação AsyncAPI dos eventos order.created e order.cancelled-->
+<!--PRINT:swagger-function.png|Swagger UI da Azure Function (HTTP Trigger calculateIndicators)-->
+
+<h2>Frontend funcionando</h2>
+<!--PRINT:front-dashboard.png|Painel: indicadores calculados pela Function, situação de cada fonte e eventos recentes-->
+<!--PRINT:front-produtos.png|Microfrontend de Produtos: lista, estoque baixo e movimentações-->
+<!--PRINT:front-pedidos.png|Microfrontend de Pedidos: lista, status e eventos-->
+
+<h2>API Gateway</h2>
+<!--PRINT:gateway-portal.png|API importada no Azure API Management, com a policy aplicada-->
+<!--PRINT:gateway-chamadas.png|Chamadas ao gateway: 401 sem chave, 200 com chave, e 401 direto no BFF-->
+
+<h2>Docker Hub, GitHub Actions e testes</h2>
+<!--PRINT:dockerhub.png|Imagens publicadas no Docker Hub-->
+<!--PRINT:github-actions.png|Esteira do GitHub Actions concluída com sucesso-->
+<!--PRINT:testes.png|Testes passando, incluindo os de arquitetura-->
+<!--PRINT:teste-arquitetura-falhando.png|Teste de arquitetura acusando uma violação plantada de propósito-->
+
+<!-- ============================================================ PARTE V -->
+<h1>Parte V — Conferência com o enunciado</h1>
+<table>
+  <tr><th style="width:37%">Item pedido</th><th style="width:7%"></th><th>Onde está</th></tr>
+  <tr><td>Microfrontend (SPA React) que consome o BFF</td><td class="ok">✔</td><td>pjbl-microfrontend · [[link:URL_FRONTEND]]</td></tr>
+  <tr><td>BFF em Node.js: agregação, proxy CRUD, chamada à Function</td><td class="ok">✔</td><td>pjbl-bff · seção 5 e C4 nível 3</td></tr>
+  <tr><td>Endpoint <code>GET /aggregated-data</code> com resposta única</td><td class="ok">✔</td><td>seção 6.1 · Swagger do BFF</td></tr>
+  <tr><td>Microserviço 1 com MongoDB Atlas, CRUD, Swagger</td><td class="ok">✔</td><td>pjbl-ms-produtos</td></tr>
+  <tr><td>Microserviço 2 com Azure SQL, CRUD, Swagger</td><td class="ok">✔</td><td>pjbl-ms-pedidos</td></tr>
+  <tr><td>Azure Function HTTP Trigger / Message Trigger</td><td class="ok">✔</td><td>pjbl-function (os dois gatilhos)</td></tr>
+  <tr><td>API Gateway: roteamento, segurança, entrada central</td><td class="ok">✔</td><td>pjbl-arquitetura/gateway · seção 8.3 · ADR-05</td></tr>
+  <tr><td>Clean Architecture (Domain, Application, Infrastructure, API)</td><td class="ok">✔</td><td>seções 5.2 e 8.1 · todos os backends</td></tr>
+  <tr><td>Vertical Slice (<code>CreateOrder</code>, <code>GetOrder</code>...)</td><td class="ok">✔</td><td>seção 5.2 · pastas <code>features/</code></td></tr>
+  <tr><td>Event-Driven Architecture</td><td class="ok">✔</td><td>seções 6.2 e 8.2 · AsyncAPI</td></tr>
+  <tr><td>Integração com múltiplos bancos</td><td class="ok">✔</td><td>MongoDB Atlas + Azure SQL</td></tr>
+  <tr><td>Testes unitários e de arquitetura</td><td class="ok">✔</td><td>seção 8.6 · {{dado:testes.total}} testes</td></tr>
+  <tr><td>Imagens no Docker Hub (microserviços + BFF)</td><td class="ok">✔</td><td>página de links</td></tr>
+  <tr><td>Repositórios públicos no GitHub</td><td class="ok">✔</td><td>página de links (5 pedidos + 1 de arquitetura)</td></tr>
+  <tr><td>README em cada projeto (arquitetura, tecnologias, como rodar, alunos)</td><td class="ok">✔</td><td>raiz de cada repositório</td></tr>
+  <tr><td>ARC42 com todos os links</td><td class="ok">✔</td><td>Parte I e página de links</td></tr>
+  <tr><td>C4 Model (Contexto, Containers, Componentes)</td><td class="ok">✔</td><td>Parte II</td></tr>
+  <tr><td>Canvas</td><td class="ok">✔</td><td>Parte III</td></tr>
+  <tr><td>Prints: Swagger BFF, Swagger microserviços, Frontend, API Gateway</td><td class="ok">✔</td><td>Parte IV</td></tr>
+  <tr><td>Vídeo no YouTube (não listado), com todos do grupo</td><td class="ok">✔</td><td>[[link:URL_VIDEO]]</td></tr>
+</table>
+
+</body>
+</html>
