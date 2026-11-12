@@ -1,0 +1,101 @@
+# Alternativa ao Azure API Management: o mesmo gateway no AWS API Gateway (REST API).
+#
+# O enunciado cita o AWS Gateway como opção. Nós publicamos no Azure APIM (ver ../README.md para o motivo),
+# mas deixamos esta definição pronta e testável: ela cria uma REST API que repassa tudo para o BFF
+# com as mesmas três funções do gateway da Azure:
+#   - roteamento ........ proxy {proxy+} para o BFF
+#   - segurança ......... API key obrigatória (cabeçalho x-api-key) + usage plan com throttling
+#   - entrada central ... injeta o cabeçalho x-gateway-secret, sem o qual o BFF responde 401
+#
+# Antes de importar, troque os dois marcadores abaixo (NÃO faça commit com os valores reais):
+#   BFF_URL          -> URL pública do BFF, sem barra no final
+#   GATEWAY_SECRET   -> mesmo valor da variável GATEWAY_SECRET do BFF
+#
+# Importação e publicação: veja o passo a passo em ../README.md (seção AWS).
+openapi: 3.0.1
+info:
+  title: Conecta Store BFF (AWS API Gateway)
+  version: 1.0.0
+  description: Gateway de entrada do Conecta Store. Todas as rotas são repassadas ao BFF.
+
+x-amazon-apigateway-api-key-source: HEADER
+
+x-amazon-apigateway-gateway-responses:
+  # respostas geradas pelo próprio gateway (401/403/429) também precisam de CORS para o front conseguir ler
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+
+paths:
+  /{proxy+}:
+    x-amazon-apigateway-any-method:
+      summary: Repassa qualquer método/rota para o BFF
+      security:
+        - ApiKey: []
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Resposta do BFF, sem alteração
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: ANY
+        uri: BFF_URL/{proxy}
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        requestParameters:
+          integration.request.path.proxy: method.request.path.proxy
+          # segredo estático que só o gateway conhece (aspas simples = valor literal)
+          integration.request.header.x-gateway-secret: "'GATEWAY_SECRET'"
+          integration.request.header.x-gateway: "'aws-api-gateway'"
+    options:
+      summary: Preflight de CORS (respondido pelo próprio gateway, sem API key)
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: CORS liberado
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 204}'
+        responses:
+          default:
+            statusCode: '204'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'content-type,x-api-key,x-correlation-id'"
+              method.response.header.Access-Control-Expose-Headers: "'x-correlation-id,server-timing,location,x-served-by'"
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      name: x-api-key
+      in: header

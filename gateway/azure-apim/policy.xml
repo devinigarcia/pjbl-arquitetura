@@ -1,0 +1,61 @@
+<!--
+  Policy da API "Conecta Store BFF" no Azure API Management (camada Consumption).
+
+  O que ela faz, na ordem:
+    1. CORS            - o microfrontend roda em outro domínio e só fala com o gateway.
+    2. rate-limit      - no máximo 120 chamadas por minuto por subscription key.
+    3. x-gateway-secret - segredo que só o gateway conhece; o BFF recusa quem chega sem ele.
+    4. remove a subscription key antes de repassar (o BFF não precisa dela).
+
+  {{bff-gateway-secret}} NÃO é placeholder nosso: é um "Named Value" secreto do próprio APIM,
+  criado pelo script configurar-apim.ps1. O valor nunca aparece neste arquivo.
+-->
+<policies>
+    <inbound>
+        <base />
+        <cors allow-credentials="false">
+            <allowed-origins>
+                <origin>*</origin>
+            </allowed-origins>
+            <allowed-methods preflight-result-max-age="600">
+                <method>GET</method>
+                <method>POST</method>
+                <method>PUT</method>
+                <method>PATCH</method>
+                <method>DELETE</method>
+                <method>OPTIONS</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+            <expose-headers>
+                <header>x-correlation-id</header>
+                <header>server-timing</header>
+                <header>location</header>
+                <header>x-served-by</header>
+                <header>x-gateway</header>
+                <header>retry-after</header>
+            </expose-headers>
+        </cors>
+        <rate-limit calls="120" renewal-period="60" />
+        <set-header name="x-gateway-secret" exists-action="override">
+            <value>{{bff-gateway-secret}}</value>
+        </set-header>
+        <set-header name="x-gateway" exists-action="override">
+            <value>azure-api-management</value>
+        </set-header>
+        <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <set-header name="x-gateway" exists-action="override">
+            <value>azure-api-management</value>
+        </set-header>
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
