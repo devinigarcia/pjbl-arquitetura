@@ -1,0 +1,11 @@
+{
+  "GITHUB_USER": "seu-usuario-do-github",
+  "DOCKERHUB_USER": "seu-usuario-do-dockerhub",
+  "URL_FRONTEND": "https://seu-usuario-do-github.github.io/pjbl-microfrontend",
+  "URL_GATEWAY": "https://apim-pjbl-xxxxxx.azure-api.net/conecta",
+  "URL_BFF": "https://bff.exemplo.brazilsouth.azurecontainerapps.io",
+  "URL_MS_PRODUTOS": "https://ms-produtos.exemplo.brazilsouth.azurecontainerapps.io",
+  "URL_MS_PEDIDOS": "https://ms-pedidos.exemplo.brazilsouth.azurecontainerapps.io",
+  "URL_FUNCTION": "https://func-pjbl-xxxxxx.azurewebsites.net",
+  "URL_VIDEO": "https://youtu.be/xxxxxxxxxxx"
+}
