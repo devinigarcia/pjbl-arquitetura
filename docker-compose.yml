@@ -1,0 +1,176 @@
+# Sobe o Conecta Store inteiro na máquina, para quem tem Docker.
+#
+# Pré-requisito: os seis repositórios clonados lado a lado (mesma pasta "pai"):
+#   pjbl-arquitetura/  pjbl-bff/  pjbl-ms-produtos/  pjbl-ms-pedidos/  pjbl-function/  pjbl-microfrontend/
+#
+#   copy .env.example .env        (Linux/Mac: cp .env.example .env)
+#   docker compose up --build
+#
+#   Front ........ http://localhost:8080
+#   BFF .......... http://localhost:3000/docs
+#   ms-produtos .. http://localhost:3001/docs
+#   ms-pedidos ... http://localhost:3002/docs   (eventos: /events/docs)
+#   Function ..... http://localhost:7071/api/docs
+#
+# Aqui não tem API Gateway (ele só existe na nuvem); o front fala direto com o BFF local.
+
+x-azurite-connection: &azurite-connection >-
+  DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+# ^ conta e chave PADRÃO e públicas do emulador Azurite (estão na documentação da Microsoft). Não é segredo.
+
+services:
+  # ---------------------------------------------------------------- bancos e fila
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?defina MSSQL_SA_PASSWORD no arquivo .env}
+    volumes:
+      - sql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # cria o banco pjbl_pedidos na primeira vez (as tabelas quem cria é o próprio ms-pedidos, na subida)
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -Q "IF DB_ID('pjbl_pedidos') IS NULL CREATE DATABASE pjbl_pedidos"
+    restart: "no"
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck --loose
+    volumes:
+      - azurite-data:/data
+
+  # ---------------------------------------------------------------- serviços
+  ms-produtos:
+    build: ../pjbl-ms-produtos
+    environment:
+      PORT: 3001
+      DB_DRIVER: mongo
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: pjbl_produtos
+      INTERNAL_API_KEY: ${PRODUTOS_API_KEY:-}
+      PUBLIC_URL: http://localhost:3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  ms-pedidos:
+    build: ../pjbl-ms-pedidos
+    environment:
+      PORT: 3002
+      DB_DRIVER: sql
+      SQL_CONNECTION_STRING: Server=tcp:sqlserver,1433;Database=pjbl_pedidos;User ID=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=true;TrustServerCertificate=true;Connection Timeout=30
+      QUEUE_CONNECTION_STRING: *azurite-connection
+      QUEUE_NAME: order-events
+      INTERNAL_API_KEY: ${PEDIDOS_API_KEY:-}
+      PUBLIC_URL: http://localhost:3002
+    ports:
+      - "3002:3002"
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+      azurite:
+        condition: service_started
+
+  function:
+    build:
+      context: ../pjbl-function
+      # o repositório da Function não precisa de Dockerfile na nuvem (ela roda no plano Flex Consumption);
+      # este aqui existe só para o ambiente local.
+      dockerfile_inline: |
+        FROM node:22-alpine AS build
+        WORKDIR /src
+        COPY package.json package-lock.json ./
+        RUN npm ci
+        COPY . .
+        RUN npm run build && npm prune --omit=dev
+
+        FROM mcr.microsoft.com/azure-functions/node:4-node22
+        ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+            AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+        COPY --from=build /src/host.json /src/package.json /home/site/wwwroot/
+        COPY --from=build /src/dist /home/site/wwwroot/dist
+        COPY --from=build /src/node_modules /home/site/wwwroot/node_modules
+    environment:
+      AzureWebJobsStorage: *azurite-connection
+      FUNCTIONS_WORKER_RUNTIME: node
+      PRODUTOS_API_URL: http://ms-produtos:3001
+      PRODUTOS_API_KEY: ${PRODUTOS_API_KEY:-}
+      ORDER_EVENTS_QUEUE: order-events
+      # chaves da Function lidas de arquivo, para o BFF local conseguir chamar o HTTP Trigger
+      AzureWebJobsSecretStorageType: files
+    volumes:
+      - ./infra/compose/function-keys:/azure-functions-host/Secrets:ro
+    ports:
+      - "7071:80"
+    depends_on:
+      - azurite
+      - ms-produtos
+
+  bff:
+    build: ../pjbl-bff
+    environment:
+      PORT: 3000
+      PRODUTOS_API_URL: http://ms-produtos:3001
+      PRODUTOS_API_KEY: ${PRODUTOS_API_KEY:-}
+      PEDIDOS_API_URL: http://ms-pedidos:3002
+      PEDIDOS_API_KEY: ${PEDIDOS_API_KEY:-}
+      FUNCTION_URL: http://function/api
+      FUNCTION_KEY: chave-local-da-function
+      CORS_ORIGIN: "*"
+      PUBLIC_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ms-produtos
+      - ms-pedidos
+      - function
+
+  frontend:
+    build:
+      context: ../pjbl-microfrontend
+      dockerfile_inline: |
+        FROM node:22-alpine AS build
+        WORKDIR /src
+        COPY . .
+        RUN npm ci
+        ENV VITE_API_URL=http://localhost:3000
+        RUN npm run build
+
+        FROM nginx:1.27-alpine
+        COPY --from=build /src/dist /usr/share/nginx/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - bff
+
+volumes:
+  mongo-data:
+  sql-data:
+  azurite-data:

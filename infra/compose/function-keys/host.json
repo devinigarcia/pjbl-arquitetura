@@ -1,0 +1,5 @@
+{
+  "masterKey": { "name": "master", "value": "chave-mestra-local", "encrypted": false },
+  "functionKeys": [{ "name": "default", "value": "chave-local-da-function", "encrypted": false }],
+  "systemKeys": []
+}
