@@ -24,7 +24,7 @@ Sistema: Conecta Store (gestão de produtos, estoque e pedidos)
 Grupo: Arthur Ambrozewicz Cidral, Erick Marlon Barbieri da Silva, Luan Alberti Estevinho e Vinícius de Oliveira Garcia
 
 VÍDEO (YouTube, não listado)
-{{URL_VIDEO}}
+https://youtu.be/TpbhGoSWqI8
 
 APLICAÇÃO NA NUVEM
 Frontend (microfrontend): https://devinigarcia.github.io/pjbl-microfrontend
@@ -75,11 +75,11 @@ https://github.com/devinigarcia/pjbl-arquitetura/blob/main/docs/entrega/Entrega3
 | C4 Model: Contexto, Containers, Componentes | PDF, Parte II |
 | Canvas | PDF, Parte III |
 | Prints: Swagger BFF, Swagger dos microserviços, Frontend, API Gateway | PDF, Parte IV |
-| Vídeo no YouTube (não listado), com todos falando | {{URL_VIDEO}} · roteiro em [docs/roteiro-video.md](../roteiro-video.md) |
+| Vídeo no YouTube (não listado), com todos falando | https://youtu.be/TpbhGoSWqI8 · roteiro em [docs/roteiro-video.md](../roteiro-video.md) |
 
 ## Antes de enviar
 
-- [ ] Gravar o vídeo seguindo o roteiro e publicar como **Não listado**.
-- [ ] Colocar o link em `URL_VIDEO` no `links.json` e rodar `node scripts/preencher-links.mjs` e `node scripts/gerar-pdf.mjs`.
-- [ ] Conferir que no PDF, na página "Links da entrega", o vídeo não aparece mais como pendente.
-- [ ] Abrir o front e esperar o painel carregar com as três fontes em verde (a primeira chamada depois de um tempo parado demora).
+- [x] Gravar o vídeo e publicar como **Não listado**.
+- [x] Colocar o link em `URL_VIDEO` no `links.json` e rodar `node scripts/preencher-links.mjs` e `node scripts/gerar-pdf.mjs`.
+- [x] Conferir que no PDF, na página "Links da entrega", o vídeo aparece com o link.
+- [ ] No dia da correção, abrir o front e esperar o painel carregar com as três fontes em verde (a primeira chamada depois de um tempo parado demora).

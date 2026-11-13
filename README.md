@@ -16,7 +16,7 @@ o script que sobe a nuvem, o `docker-compose` para rodar tudo local e os scripts
 | **pjbl-arquitetura** (este) | Documentação, gateway, infraestrutura e scripts | — |
 
 Entrada oficial da aplicação (API Gateway): https://apim-pjbl-0a42b2.azure-api.net/conecta
-Vídeo da apresentação: {{URL_VIDEO}}
+Vídeo da apresentação: https://youtu.be/TpbhGoSWqI8
 Imagens no Docker Hub: [pjbl-bff](https://hub.docker.com/r/vinigarciaa/pjbl-bff) ·
 [pjbl-ms-produtos](https://hub.docker.com/r/vinigarciaa/pjbl-ms-produtos) ·
 [pjbl-ms-pedidos](https://hub.docker.com/r/vinigarciaa/pjbl-ms-pedidos)
