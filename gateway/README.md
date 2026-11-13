@@ -30,7 +30,8 @@ Para não ficar só na justificativa, a pasta `aws/` tem a definição equivalen
 | Arquivo | Para que serve |
 |---|---|
 | `policy.xml` | Policy aplicada na API: CORS, `rate-limit` (120 chamadas/min por chave), cabeçalho `x-gateway-secret`, remoção da subscription key antes de repassar |
-| `configurar-apim.ps1` | Cria a instância, o Named Value secreto, importa a API, aplica a policy e cria a subscription do front |
+| `global-policy.xml` | Policy global da instância: faz o endereço-base (`/conecta`, que não é uma rota da API) responder uma página de apresentação com as rotas e os links, em vez do 404 padrão do APIM. Não chama o BFF nem mostra dados |
+| `configurar-apim.ps1` | Cria a instância, o Named Value secreto, importa a API, aplica as duas policies e cria a subscription do front |
 
 O `infra/deploy-azure.ps1` já chama o `configurar-apim.ps1`. Para rodar só o gateway:
 

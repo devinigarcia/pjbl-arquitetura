@@ -1,0 +1,94 @@
+<!--
+  Policy global do API Management (vale para a instância inteira, fora de qualquer API).
+
+  Só existe por um motivo: o endereço-base do gateway (/conecta) não é uma rota da API, então o APIM
+  respondia 404 "Resource not found" para quem abria o link no navegador. Aqui a gente pega esse caso
+  (erro OperationNotFound em GET /conecta) e devolve uma página de apresentação com as rotas e os links.
+
+  As rotas de verdade continuam iguais: passam pela policy da API (policy.xml) e exigem a chave.
+  Esta página não chama o BFF e não mostra nenhum dado, por isso pode ficar aberta.
+-->
+<policies>
+    <inbound>
+    </inbound>
+    <backend>
+        <forward-request />
+    </backend>
+    <outbound>
+    </outbound>
+    <on-error>
+        <choose>
+            <when condition="@(context.LastError != null && context.LastError.Reason == "OperationNotFound" && context.Request.Method == "GET" && context.Request.OriginalUrl.Path.TrimEnd('/').ToLower() == "/conecta")">
+                <return-response>
+                    <set-status code="200" reason="OK" />
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>text/html; charset=utf-8</value>
+                    </set-header>
+                    <set-header name="x-gateway" exists-action="override">
+                        <value>azure-api-management</value>
+                    </set-header>
+                    <set-body><![CDATA[<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conecta Store - API Gateway</title>
+<style>
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: #f4f6fa; color: #1c2738; line-height: 1.55; }
+  main { max-width: 820px; margin: 0 auto; padding: 40px 20px 56px; }
+  .tag { display: inline-block; background: #12325a; color: #fff; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
+  h1 { font-size: 30px; margin: 14px 0 6px; color: #12325a; }
+  h2 { font-size: 18px; margin: 32px 0 10px; color: #12325a; }
+  p { margin: 8px 0; }
+  .card { background: #fff; border: 1px solid #dbe2ec; border-radius: 8px; padding: 6px 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  td { padding: 9px 6px; border-bottom: 1px solid #e8edf4; vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; background: #eef2f8; padding: 2px 6px; border-radius: 4px; }
+  .m { display: inline-block; min-width: 46px; font: 600 12px Consolas, monospace; color: #1a7f4b; }
+  a { color: #1a5fb4; }
+  .aviso { background: #fff7e0; border: 1px solid #f0d98a; border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+  footer { margin-top: 36px; font-size: 13px; color: #5b6a7e; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">API Gateway &middot; Azure API Management</span>
+  <h1>Conecta Store</h1>
+  <p>Este endereço é a entrada única das APIs do projeto. O microfrontend só conversa com o gateway: ele confere a chave,
+  limita a 120 chamadas por minuto e repassa a requisição ao BFF, que por sua vez fala com os microserviços e com a Azure Function.</p>
+
+  <div class="aviso">
+    As rotas abaixo exigem o cabeçalho <code>Ocp-Apim-Subscription-Key</code>. Sem a chave o gateway responde <strong>401</strong> &mdash;
+    dá para conferir abrindo <a href="/conecta/aggregated-data">/conecta/aggregated-data</a> direto no navegador.
+  </div>
+
+  <h2>Rotas publicadas</h2>
+  <div class="card">
+    <table>
+      <tr><td><span class="m">GET</span> <code>/conecta/aggregated-data</code></td><td>Resposta única do painel: produtos, pedidos e indicadores da Function</td></tr>
+      <tr><td><span class="m">GET</span> <code>/conecta/products</code></td><td>CRUD de produtos e movimentações de estoque (MongoDB Atlas)</td></tr>
+      <tr><td><span class="m">GET</span> <code>/conecta/orders</code></td><td>CRUD de pedidos e mudança de status (Azure SQL)</td></tr>
+      <tr><td><span class="m">GET</span> <code>/conecta/events</code></td><td>Eventos dos pedidos (outbox, fila e Function)</td></tr>
+      <tr><td><span class="m">GET</span> <code>/conecta/health</code></td><td>Situação do BFF e dos serviços que ele chama</td></tr>
+    </table>
+  </div>
+
+  <h2>Onde ver funcionando</h2>
+  <div class="card">
+    <table>
+      <tr><td>Frontend (usa este gateway)</td><td><a href="https://devinigarcia.github.io/pjbl-microfrontend">devinigarcia.github.io/pjbl-microfrontend</a></td></tr>
+      <tr><td>Swagger do BFF</td><td><a href="https://bff.agreeablesand-8dc3837e.brazilsouth.azurecontainerapps.io/docs">bff&hellip;azurecontainerapps.io/docs</a></td></tr>
+      <tr><td>Configuração do gateway</td><td><a href="https://github.com/devinigarcia/pjbl-arquitetura/tree/main/gateway">github.com/devinigarcia/pjbl-arquitetura/gateway</a></td></tr>
+    </table>
+  </div>
+
+  <footer>Projeto PJBL &ndash; Arquitetura Completa &middot; Arthur Ambrozewicz Cidral, Erick Marlon Barbieri da Silva, Luan Alberti Estevinho e Vinícius de Oliveira Garcia</footer>
+</main>
+</body>
+</html>]]></set-body>
+                </return-response>
+            </when>
+        </choose>
+    </on-error>
+</policies>

@@ -7,7 +7,8 @@
     1. cria a instância do APIM (Consumption não tem custo fixo; o primeiro milhão de chamadas/mês é gratuito)
     2. guarda o segredo do BFF como Named Value secreto
     3. importa a API a partir do OpenAPI do BFF
-    4. aplica a policy (CORS, rate limit, x-gateway-secret)
+    4. aplica a policy da API (CORS, rate limit, x-gateway-secret) e a policy global
+       (página de apresentação no endereço-base /conecta)
     5. cria a subscription "microfrontend" (a chave que o front envia)
 
   O deploy-azure.ps1 chama este script no final, mas ele também funciona sozinho.
@@ -126,6 +127,13 @@ try {
     # --output-file: a resposta desta chamada vem com BOM e o az no Windows falha ao tentar mostrá-la na tela
     Invoke-Az rest --method put --uri "$management/apis/$ApiId/policies/policy?api-version=$apiVersion" `
         --body "@$policyFile" --output-file (Join-Path $workDir 'policy-resposta.txt')
+
+    # Policy global: só faz o endereço-base (/conecta) responder uma página de apresentação em vez de 404.
+    $globalPolicyXml = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'global-policy.xml'))
+    $globalPolicyFile = Join-Path $workDir 'global-policy.json'
+    Write-JsonFile $globalPolicyFile @{ properties = @{ format = 'rawxml'; value = $globalPolicyXml } }
+    Invoke-Az rest --method put --uri "$management/policies/policy?api-version=$apiVersion" `
+        --body "@$globalPolicyFile" --output-file (Join-Path $workDir 'global-policy-resposta.txt')
 
     # ---------- 5. subscription do front ----------
     Write-Host '[5/5] Subscription "microfrontend"...' -ForegroundColor Cyan
